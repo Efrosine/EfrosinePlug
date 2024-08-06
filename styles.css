@@ -1,8 +1,46 @@
-/*
+.efro-setting-field {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+.efro-setting-field .full-width {
+    flex: 1;
 
-If your plugin does not need CSS, delete this file.
+}
 
-*/
+.efro-label {
+    margin-right: 12px;
+}
+
+.efro-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.efro-select-input {
+    
+    margin-right: 12px;
+}
+
+.efro-footer-actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    align-items: center;
+    margin-top: 12px;
+}
+
+.efro-setting-field input[type="date"],
+.efro-setting-field input[type="datetime-local"] {
+    text-align: end;
+}
+
+.spacer {
+    width: 100%;
+}
+
+
