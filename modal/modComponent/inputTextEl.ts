@@ -6,10 +6,10 @@ interface InputTextElParams {
 }
 
 export class InputTextEl {
-	parent: HTMLElement;
-	label: string;
-	value?: string;
-	disable?: boolean;
+	private parent: HTMLElement;
+	private label: string;
+	private value?: string;
+	private disable?: boolean;
 
 	constructor({ parent, label, value, disable }: InputTextElParams) {
 		this.parent = parent;

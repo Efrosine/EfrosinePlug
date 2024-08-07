@@ -6,10 +6,10 @@ interface InputDropdwonElParams {
 }
 
 export class InputDropdwonEl {
-	parent: HTMLElement;
-	label: string;
-	option: Map<string, string>;
-	selected: string;
+	private parent: HTMLElement;
+	private label: string;
+	private option: Map<string, string>;
+	private selected: string;
 
 	constructor({ parent, label, option, selected }: InputDropdwonElParams) {
 		this.parent = parent;

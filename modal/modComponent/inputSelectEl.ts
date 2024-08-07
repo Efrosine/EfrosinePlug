@@ -6,9 +6,9 @@ interface InputSelectElParams {
 }
 
 export class InputSelectEl {
-	parent: HTMLElement;
-	label: string;
-	option: Array<string>;
+	private parent: HTMLElement;
+	private label: string;
+	private option: Array<string>;
 
 	constructor({ parent, label, option }: InputSelectElParams) {
 		this.parent = parent;

@@ -1,4 +1,4 @@
-import { FrontMatterCache, Notice, SuggestModal, TFile, } from "obsidian";
+import { FrontMatterCache, Notice, SuggestModal, TFile } from "obsidian";
 import EfrosinePlugin from "../main";
 import { EfrosineSettings, FrontmatterField } from "../configs/coreConfig";
 import { FrontmatterEngine } from "../engine/frontmatterEngine";
@@ -17,8 +17,8 @@ interface FmOptionModParams {
 }
 
 export class FmOptionMod extends SuggestModal<string> {
-	plugin: EfrosinePlugin;
-	settings: EfrosineSettings;
+	private plugin: EfrosinePlugin;
+	private settings: EfrosineSettings;
 	constructor({ plugin }: FmOptionModParams) {
 		super(plugin.app);
 		this.plugin = plugin;
@@ -44,11 +44,11 @@ export class FmOptionMod extends SuggestModal<string> {
 }
 
 class BaseFmMod extends SuggestModal<FrontmatterField> {
-	plugin: EfrosinePlugin;
-	fmFields: FrontmatterField[];
-	curFm: FrontMatterCache | null | undefined;
-	fmEngine: FrontmatterEngine;
-	file: TFile | null;
+	protected plugin: EfrosinePlugin;
+	protected fmFields: FrontmatterField[];
+	protected curFm: FrontMatterCache | null | undefined;
+	protected fmEngine: FrontmatterEngine;
+	protected file: TFile | null;
 	constructor(plugin: EfrosinePlugin) {
 		super(plugin.app);
 		this.plugin = plugin;
@@ -98,7 +98,7 @@ class AddFmMod extends BaseFmMod {
 	}
 }
 
-class UpdataFmMod extends BaseFmMod {
+export class UpdataFmMod extends BaseFmMod {
 	getSuggestions(
 		query: string
 	): FrontmatterField[] | Promise<FrontmatterField[]> {
@@ -120,30 +120,28 @@ class UpdataFmMod extends BaseFmMod {
 	onChooseSuggestion(item: FrontmatterField) {
 		switch (item.type) {
 			case FmFieldType.Text:
-				new InsertTTextFmMod(this.app, item.name).open();
+				new InsertTTextFmMod(this.plugin, item.name).open();
 				break;
 			case FmFieldType.Number:
-				new InsertNNumberFmMod(this.app, item.name).open();
+				new InsertNNumberFmMod(this.plugin, item.name).open();
 				break;
 			case FmFieldType.List:
 			case FmFieldType.Tags:
-				new InsertListFmMod(this.app, item.name).open();
+				new InsertListFmMod(this.plugin, item.name).open();
 				break;
 			case FmFieldType.Select:
 				new InsertSelectFmMod(
-					this.app,
+					this.plugin,
 					item.name,
 					item.options ?? []
 				).open();
 				break;
 			case FmFieldType.Date:
-				new InsertDateCustomFmMod(this.app, item.name).open();
+				new InsertDateCustomFmMod(this.plugin, item.name).open();
 				break;
 			case FmFieldType.DateTime:
-				new InsertDateTimeCustomFmMod(this.app, item.name).open();
+				new InsertDateTimeCustomFmMod(this.plugin, item.name).open();
 				break;
 		}
 	}
 }
-
-
