@@ -32,6 +32,12 @@
     justify-content: end;
     align-items: center;
     margin-top: 12px;
+    gap:10px;
+}
+
+.efro-footer-actions p{
+color: #FFFFFF80;
+font-size: small;
 }
 
 .efro-setting-field input[type="date"],

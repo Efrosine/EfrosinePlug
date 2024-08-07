@@ -1,14 +1,18 @@
 import { App, Modal, Notice, TFile, SuggestModal } from "obsidian";
 import { FrontmatterEngine } from "engine/frontmatterEngine";
+import { UpdataFmMod } from "modal/fmOptionsMod";
+import EfrosinePlugin from "main";
 
 class BaseInputFmMod extends Modal {
 	protected title: string;
 	private inputType: string;
 	protected fmEngine: FrontmatterEngine;
 	private file: TFile | null;
+	private plugin: EfrosinePlugin;
 
-	constructor(app: App, title: string, inputType: string) {
-		super(app);
+	constructor(plugin: EfrosinePlugin, title: string, inputType: string) {
+		super(plugin.app);
+		this.plugin = plugin;
 		this.title = title;
 		this.inputType = inputType;
 		this.fmEngine = new FrontmatterEngine({ app: this.app });
@@ -17,6 +21,12 @@ class BaseInputFmMod extends Modal {
 
 	onOpen(): void {
 		let { contentEl, titleEl } = this;
+
+		contentEl.addEventListener("keydown", (evt: KeyboardEvent) => {
+			if (evt.key === "Escape") {
+				new UpdataFmMod(this.plugin).open();
+			}
+		});
 
 		if (!this.file) {
 			new Notice("No file is open");
@@ -48,6 +58,10 @@ class BaseInputFmMod extends Modal {
 		this.createNote(contentEl);
 
 		const footerEl = contentEl.createDiv({ cls: "efro-footer-actions" });
+		const tooltipText = footerEl.createEl("p", {
+			text: "Alt + Enter to Insert",
+		});
+
 		const addButton = footerEl.createEl("button", {
 			text: "Insert",
 			cls: "mod-cta",
@@ -75,14 +89,14 @@ class BaseInputFmMod extends Modal {
 }
 
 export class InsertTTextFmMod extends BaseInputFmMod {
-	constructor(app: App, title: string) {
-		super(app, title, "text");
+	constructor(plugin: EfrosinePlugin, title: string) {
+		super(plugin, title, "text");
 	}
 }
 
 export class InsertNNumberFmMod extends BaseInputFmMod {
-	constructor(app: App, title: string) {
-		super(app, title, "number");
+	constructor(plugin: EfrosinePlugin, title: string) {
+		super(plugin, title, "number");
 	}
 
 	updateFm(file: TFile, value: string): void {
@@ -96,20 +110,20 @@ export class InsertNNumberFmMod extends BaseInputFmMod {
 }
 
 export class InsertDateCustomFmMod extends BaseInputFmMod {
-	constructor(app: App, title: string) {
-		super(app, title, "date");
+	constructor(plugin: EfrosinePlugin, title: string) {
+		super(plugin, title, "date");
 	}
 }
 
 export class InsertDateTimeCustomFmMod extends BaseInputFmMod {
-	constructor(app: App, title: string) {
-		super(app, title, "datetime-local");
+	constructor(plugin: EfrosinePlugin, title: string) {
+		super(plugin, title, "datetime-local");
 	}
 }
 
 export class InsertListFmMod extends BaseInputFmMod {
-	constructor(app: App, title: string) {
-		super(app, title, "text");
+	constructor(plugin: EfrosinePlugin, title: string) {
+		super(plugin, title, "text");
 	}
 
 	updateFm(file: TFile, value: string): void {
@@ -127,10 +141,12 @@ export class InsertListFmMod extends BaseInputFmMod {
 }
 
 export class InsertSelectFmMod extends SuggestModal<string> {
-	options: string[];
-	title: string;
-	constructor(app: App, title: string, options: string[]) {
-		super(app);
+	private options: string[];
+	private title: string;
+	private plugin: EfrosinePlugin;
+	constructor(plugin: EfrosinePlugin, title: string, options: string[]) {
+		super(plugin.app);
+		this.plugin = plugin;
 		this.title = title;
 		this.options = options;
 	}
