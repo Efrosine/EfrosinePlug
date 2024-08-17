@@ -1,5 +1,18 @@
-import { DateOptions, FmFieldType } from "./enums";
-
+import { Command } from "obsidian";
+import {
+	CaptureInsertWhere,
+	DateOptions,
+	FmFieldType,
+	MacroType,
+} from "./enums";
+export interface EfrosineSettings {
+	fmFields: FrontmatterField[];
+	macros: MacroField[];
+}
+export const DEFAULT_SETTINGS: EfrosineSettings = {
+	fmFields: [],
+	macros: [],
+};
 export interface FrontmatterField {
 	name: string;
 	type: FmFieldType;
@@ -7,9 +20,24 @@ export interface FrontmatterField {
 	dateOptions?: DateOptions;
 }
 
-export interface EfrosineSettings {
-	fmFields: FrontmatterField[];
+type CombineFunction = CaptureFunction | SequenceFunction;
+
+export interface MacroField {
+	name: string;
+	type: MacroType;
+	addToCommand: boolean;
+	funcions?: CombineFunction;
 }
-export const DEFAULT_SETTINGS: EfrosineSettings = {
-	fmFields: [],
-};
+
+export interface CaptureFunction {
+	toActiveFile: boolean;
+	filePath: string;
+	inssertWhere: CaptureInsertWhere;
+	insertAtEndSection?: boolean;
+	insertRegEx?: string;
+	value: string;
+}
+
+export interface SequenceFunction {
+	value: Command[];
+}

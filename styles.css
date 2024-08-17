@@ -6,6 +6,9 @@
     margin-bottom: 10px;
 }
 
+.no-line{
+    border: none;
+}
 .efro-setting-field .full-width {
     flex: 1;
 
@@ -48,5 +51,6 @@ font-size: small;
 .spacer {
     width: 100%;
 }
+
 
 

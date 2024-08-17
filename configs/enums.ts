@@ -7,6 +7,18 @@ export enum FmFieldType {
 	DateTime = "datetime",
 	Tags = "tags",
 }
+export enum MacroType {
+	Capture = "capture",
+	Sequence = "sequence",
+}
+export enum CaptureInsertWhere {
+	Cursor = "Cursor",
+	Top = "Top (after fm)",
+	Bottom = "Bottom File",
+	Replace = "Replace",
+	InsertAfter = "Insert After",
+	InsertBefore = "Insert Before",
+}
 
 export enum CrudFrontmatter {
 	ADD = "Add Frontmatter Field",

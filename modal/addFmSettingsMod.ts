@@ -6,18 +6,18 @@ import { InputDropdwonEl } from "./modComponent/inputDropdownEl";
 import { InputSelectEl } from "./modComponent/inputSelectEl";
 import { EfrosineSettings, FrontmatterField } from "../configs/coreConfig";
 
-interface AddFmFieldModParams {
+interface AddFmSettingsModParams {
 	plugin: EfrosinePlugin;
 	fmField?: FrontmatterField;
 }
 
-export class AddFmFieldMod extends Modal {
+export class AddFmSettingsMod extends Modal {
 	private plugin: EfrosinePlugin;
 	private setting: EfrosineSettings;
 	private fmField: FrontmatterField;
 	private resolvePromise: (val?: unknown) => void;
 
-	constructor({ plugin, fmField }: AddFmFieldModParams) {
+	constructor({ plugin, fmField }: AddFmSettingsModParams) {
 		super(plugin.app);
 		this.plugin = plugin;
 		this.fmField = fmField ?? this.loadField();

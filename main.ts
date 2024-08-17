@@ -6,10 +6,12 @@ import {
 	EfrosineSettings,
 	DEFAULT_SETTINGS,
 	FrontmatterField,
+	MacroField,
 } from "./configs/coreConfig";
 
 import { FrontmatterEngine } from "./engine/frontmatterEngine";
 import { DateFormat, DateOptions } from "configs/enums";
+import { CommandEngine } from "engine/commandEngine";
 
 export default class EfrosinePlugin extends Plugin {
 	settings: EfrosineSettings;
@@ -26,6 +28,8 @@ export default class EfrosinePlugin extends Plugin {
 				new FmOptionMod({ plugin: this }).open();
 			},
 		});
+
+		new CommandEngine(this).loadCommands();
 
 		this.registerEvent(
 			this.app.workspace.on("editor-change", () => this.updateMtime())
@@ -46,6 +50,11 @@ export default class EfrosinePlugin extends Plugin {
 
 	public async saveFmSetting(fmSettings: FrontmatterField[]) {
 		this.settings.fmFields = fmSettings;
+		await this.saveData(this.settings);
+	}
+
+	public async saveMacroSetting(macroSettings: MacroField[]) {
+		this.settings.macros = macroSettings;
 		await this.saveData(this.settings);
 	}
 
