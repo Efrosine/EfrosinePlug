@@ -52,5 +52,14 @@ font-size: small;
     width: 100%;
 }
 
+.end-div{
+    display: flex;
+    justify-content: flex-end;
+    padding: 40px;
+}
+
+.end-div button{
+    display: inline-block;
+}
 
 

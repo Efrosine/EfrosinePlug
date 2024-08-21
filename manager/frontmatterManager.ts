@@ -3,14 +3,14 @@ import * as yaml from "js-yaml";
 import { FrontmatterField } from "configs/coreConfig";
 import { DateFormat, DateOptions, FmFieldType } from "configs/enums";
 
-interface FrontmatterEngineParams {
+interface FrontmatterManagerParams {
 	app: App;
 }
 
-export class FrontmatterEngine {
+export class FrontmatterManager {
 	private app: App;
 
-	constructor({ app }: FrontmatterEngineParams) {
+	constructor({ app }: FrontmatterManagerParams) {
 		this.app = app;
 	}
 

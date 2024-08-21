@@ -1,7 +1,7 @@
 import { FrontMatterCache, Notice, SuggestModal, TFile } from "obsidian";
 import EfrosinePlugin from "../main";
 import { EfrosineSettings, FrontmatterField } from "../configs/coreConfig";
-import { FrontmatterEngine } from "../engine/frontmatterEngine";
+import { FrontmatterManager } from "../manager/frontmatterManager";
 import { CrudFrontmatter, DateOptions, FmFieldType } from "../configs/enums";
 import {
 	InsertNNumberFmMod,
@@ -47,7 +47,7 @@ class BaseFmMod extends SuggestModal<FrontmatterField> {
 	protected plugin: EfrosinePlugin;
 	protected fmFields: FrontmatterField[];
 	protected curFm: FrontMatterCache | null | undefined;
-	protected fmEngine: FrontmatterEngine;
+	protected fmEngine: FrontmatterManager;
 	protected file: TFile | null;
 	constructor(plugin: EfrosinePlugin) {
 		super(plugin.app);
@@ -62,7 +62,7 @@ class BaseFmMod extends SuggestModal<FrontmatterField> {
 		this.curFm = this.file
 			? this.app.metadataCache.getFileCache(this.file)?.frontmatter
 			: null;
-		this.fmEngine = new FrontmatterEngine({ app: this.plugin.app });
+		this.fmEngine = new FrontmatterManager({ app: this.plugin.app });
 	}
 	getSuggestions(
 		query: string

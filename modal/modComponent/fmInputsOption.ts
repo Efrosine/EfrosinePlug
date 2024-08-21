@@ -1,12 +1,12 @@
 import { App, Modal, Notice, TFile, SuggestModal } from "obsidian";
-import { FrontmatterEngine } from "engine/frontmatterEngine";
+import { FrontmatterManager } from "manager/frontmatterManager";
 import { UpdataFmMod } from "modal/fmOptionsMod";
 import EfrosinePlugin from "main";
 
 class BaseInputFmMod extends Modal {
 	protected title: string;
 	private inputType: string;
-	protected fmEngine: FrontmatterEngine;
+	protected fmEngine: FrontmatterManager;
 	private file: TFile | null;
 	private plugin: EfrosinePlugin;
 
@@ -15,7 +15,7 @@ class BaseInputFmMod extends Modal {
 		this.plugin = plugin;
 		this.title = title;
 		this.inputType = inputType;
-		this.fmEngine = new FrontmatterEngine({ app: this.app });
+		this.fmEngine = new FrontmatterManager({ app: this.app });
 		this.file = this.app.workspace.getActiveFile();
 	}
 
@@ -159,7 +159,7 @@ export class InsertSelectFmMod extends SuggestModal<string> {
 		el.setText(value);
 	}
 	onChooseSuggestion(item: string, evt: MouseEvent | KeyboardEvent) {
-		let fmEngine = new FrontmatterEngine({ app: this.app });
+		let fmEngine = new FrontmatterManager({ app: this.app });
 		const file = this.app.workspace.getActiveFile();
 		if (!file) {
 			new Notice("No file is open");

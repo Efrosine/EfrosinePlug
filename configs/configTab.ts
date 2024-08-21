@@ -4,6 +4,7 @@ import { AddFmSettingsMod as AddFmSettingdMod } from "../modal/addFmSettingsMod"
 import { SetupCaptureMacroSettingsMod } from "../modal/setupCaptureMacroSettingsMod";
 import { EfrosineSettings, FrontmatterField } from "../configs/coreConfig";
 import { FmFieldType, MacroType } from "./enums";
+import { AddButtonSettingsMod } from "modal/addButtonSettingsMod";
 
 interface SettingsTabParams {
 	plugin: EfrosinePlugin;
@@ -38,15 +39,49 @@ export class SettingsTab extends PluginSettingTab {
 		const div = this.containerEl.createDiv();
 
 		new Setting(div)
-			.setName("Add CustomButtons")
+			.setName("Add Custom Buttons")
 			.setDesc("Create button for your needs")
-			.addText((text) => text.setPlaceholder("Name"))
+
 			.addButton((button) =>
 				button
-					.setButtonText("Create")
+					.setButtonText("Add Button")
 					.setClass("mod-cta")
-					.onClick(() => {})
+					.onClick(() => {
+						new AddButtonSettingsMod({ plugin: this.plugin })
+							.open()
+							.then(() => this.display());
+					})
 			);
+
+		for (let field of this.settings.buttons) {
+			const itemFmDiv = div.createDiv();
+			new Setting(itemFmDiv)
+				.setName(field.name)
+				.setDesc(field.command.name)
+				.addButton((button) =>
+					button.setIcon("edit").onClick(() => {
+						new AddButtonSettingsMod({
+							plugin: this.plugin,
+							buttonField: field,
+						})
+							.open()
+							.then(() => this.display());
+					})
+				)
+				.addButton((button) =>
+					button
+						.setIcon("trash")
+						.setClass("mod-warning")
+						.onClick(() => {
+							this.settings.buttons =
+								this.settings.buttons.filter(
+									(item) => item.name !== field.name
+								);
+							this.plugin.saveData(this.settings);
+							this.display();
+						})
+				);
+		}
 	}
 
 	private renderCustomMacro(): void {

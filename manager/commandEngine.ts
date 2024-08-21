@@ -24,17 +24,22 @@ export class CommandEngine {
 		});
 	}
 
+	public listCommand(): Command[] {
+		//@ts-ignore
+		return this.app.commands.listCommands();
+	}
+
 	private formatCommandId(id: string): string {
 		return "efrosine-plug:" + id;
 	}
 
-	public findCommand(id: string) {
+	public findCommand(id: string): Command {
 		//@ts-ignore
-		return this.app.commands.findCommand(this.formatCommandId(id));
+		return this.app.commands.findCommand(id);
 	}
 
 	public removeCommand(id: string) {
-		if (this.findCommand(id)) {
+		if (this.findCommand(this.formatCommandId(id))) {
 			// @ts-ignore
 			delete this.app.commands.commands[this.formatCommandId(id)];
 			//@ts-ignore
@@ -43,10 +48,17 @@ export class CommandEngine {
 	}
 
 	public loadCommands() {
-		const macroFields = this.plugin.settings.macros;
+		const macroFields = this.plugin.settings.macros.filter(
+			(field) => field.addToCommand
+		);
 		macroFields.forEach((field) => {
-			if (field.addToCommand) this.addCommand(field);
+			this.addCommand(field);
 		});
+	}
+
+	public executeCommand(id: string) {
+		//@ts-ignore
+		this.app.commands.executeCommandById(id);
 	}
 }
 

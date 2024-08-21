@@ -6,8 +6,8 @@ import {
 import { CaptureInsertWhere } from "configs/enums";
 import EfrosinePlugin from "main";
 import { Modal, Notice, Setting } from "obsidian";
-import { FileSugest } from "engine/fileSugest";
-import { CommandEngine } from "engine/commandEngine";
+import { FileSugest } from "manager/fileSugest";
+import { CommandEngine } from "manager/commandEngine";
 
 interface SetupCaptureMacroSettigsModParams {
 	plugin: EfrosinePlugin;

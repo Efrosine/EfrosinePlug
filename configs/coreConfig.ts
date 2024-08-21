@@ -8,10 +8,12 @@ import {
 export interface EfrosineSettings {
 	fmFields: FrontmatterField[];
 	macros: MacroField[];
+	buttons: ButtonField[];
 }
 export const DEFAULT_SETTINGS: EfrosineSettings = {
 	fmFields: [],
 	macros: [],
+	buttons: [],
 };
 export interface FrontmatterField {
 	name: string;
@@ -40,4 +42,10 @@ export interface CaptureFunction {
 
 export interface SequenceFunction {
 	value: Command[];
+}
+
+export interface ButtonField {
+	name: string;
+	position: string;
+	command: Command;
 }
