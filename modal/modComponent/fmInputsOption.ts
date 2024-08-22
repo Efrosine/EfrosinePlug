@@ -1,4 +1,4 @@
-import { App, Modal, Notice, TFile, SuggestModal } from "obsidian";
+import { Modal, Notice, TFile, SuggestModal } from "obsidian";
 import { FrontmatterManager } from "manager/frontmatterManager";
 import { UpdataFmMod } from "modal/fmOptionsMod";
 import EfrosinePlugin from "main";
@@ -32,7 +32,7 @@ class BaseInputFmMod extends Modal {
 			new Notice("No file is open");
 			return;
 		}
-		const curFm = this.fmEngine.getCurFm(this.file);
+		const curFm = this.fmEngine.getCurrentField(this.file);
 		let value: string = curFm?.[this.title] ?? "";
 
 		contentEl.addEventListener("keydown", (evt: KeyboardEvent) => {
@@ -58,7 +58,7 @@ class BaseInputFmMod extends Modal {
 		this.createNote(contentEl);
 
 		const footerEl = contentEl.createDiv({ cls: "efro-footer-actions" });
-		const tooltipText = footerEl.createEl("p", {
+		footerEl.createEl("p", {
 			text: "Alt + Enter to Insert",
 		});
 
@@ -79,7 +79,7 @@ class BaseInputFmMod extends Modal {
 	createNote(contentEl: HTMLElement): void {}
 
 	updateFm(file: TFile, value: string): void {
-		this.fmEngine.updateFm(file, { [this.title]: value });
+		this.fmEngine.updateFrontMatter(file, { [this.title]: value });
 	}
 
 	onClose(): void {
@@ -102,7 +102,9 @@ export class InsertNNumberFmMod extends BaseInputFmMod {
 	updateFm(file: TFile, value: string): void {
 		const numberValue = Number(value);
 		if (!isNaN(numberValue)) {
-			this.fmEngine.updateFm(file, { [this.title]: numberValue });
+			this.fmEngine.updateFrontMatter(file, {
+				[this.title]: numberValue,
+			});
 		} else {
 			new Notice("Please enter a valid number");
 		}
@@ -130,7 +132,7 @@ export class InsertListFmMod extends BaseInputFmMod {
 		const listValue = value.contains(",")
 			? value.split(",").map((item) => item.trim())
 			: [value];
-		this.fmEngine.updateFm(file, { [this.title]: listValue });
+		this.fmEngine.updateFrontMatter(file, { [this.title]: listValue });
 	}
 
 	createNote(contentEl: HTMLElement): void {
@@ -165,7 +167,7 @@ export class InsertSelectFmMod extends SuggestModal<string> {
 			new Notice("No file is open");
 			return;
 		}
-		fmEngine.updateFm(file, { [this.title]: item });
+		fmEngine.updateFrontMatter(file, { [this.title]: item });
 		new Notice("Frontmatter Updated");
 		this.close();
 	}

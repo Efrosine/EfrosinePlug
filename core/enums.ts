@@ -11,6 +11,17 @@ export enum MacroType {
 	Capture = "capture",
 	Sequence = "sequence",
 }
+
+export enum ButtonType {
+	Nav = "mod-nav",
+	Warnig = "mod-warning",
+	Cta = "mod-cta",
+}
+
+export enum ButtonPosition {
+	Left = "but-left",
+	Right = "but-right",
+}
 export enum CaptureInsertWhere {
 	Cursor = "Cursor",
 	Top = "Top (after fm)",

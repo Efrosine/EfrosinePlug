@@ -1,8 +1,8 @@
 import { FrontMatterCache, Notice, SuggestModal, TFile } from "obsidian";
 import EfrosinePlugin from "../main";
-import { EfrosineSettings, FrontmatterField } from "../configs/coreConfig";
+import { EfrosineSettings, FrontmatterField } from "../core/coreConfig";
 import { FrontmatterManager } from "../manager/frontmatterManager";
-import { CrudFrontmatter, DateOptions, FmFieldType } from "../configs/enums";
+import { CrudFrontmatter, DateOptions, FmFieldType } from "../core/enums";
 import {
 	InsertNNumberFmMod,
 	InsertTTextFmMod,
@@ -94,7 +94,7 @@ class AddFmMod extends BaseFmMod {
 			new Notice("No file is open");
 			return;
 		}
-		this.fmEngine.addFm(this.file, item);
+		this.fmEngine.insertFrontmatter(this.file, item);
 	}
 }
 

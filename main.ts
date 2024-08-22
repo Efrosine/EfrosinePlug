@@ -1,18 +1,13 @@
-import { Notice, Plugin, moment } from "obsidian";
+import { Notice, Plugin } from "obsidian";
 
-import { SettingsTab } from "./configs/configTab";
+import { SettingsTab } from "./core/configTab";
 import { FmOptionMod } from "./modal/fmOptionsMod";
-import {
-	EfrosineSettings,
-	DEFAULT_SETTINGS,
-	FrontmatterField,
-	MacroField,
-} from "./configs/coreConfig";
+import { EfrosineSettings, DEFAULT_SETTINGS } from "./core/coreConfig";
 
 import { FrontmatterManager } from "./manager/frontmatterManager";
-import { DateFormat, DateOptions } from "configs/enums";
-import { CommandEngine } from "manager/commandEngine";
-import { ButtonEngine, ButtonPostProcessor } from "manager/buttonEngine";
+import { CommandManager } from "manager/commandManager";
+import { ButtonManager } from "manager/buttonManager";
+import { PostProcessorManager } from "manager/postProcessorManager";
 import { InsertButtonMod } from "modal/insertButtonMod";
 
 export default class EfrosinePlugin extends Plugin {
@@ -24,17 +19,11 @@ export default class EfrosinePlugin extends Plugin {
 		this.settings = await this.loadSettings();
 		this.addSettingTab(new SettingsTab({ plugin: this }));
 
-		new ButtonPostProcessor(this).execute();
+		new PostProcessorManager(this).execute();
 		this.addRibbonIcon("dice", "test", () => {
-			new ButtonEngine(this).insertButton({
-				name: "Test",
-				position: "toolbar",
-				command: {
-					name: "Test",
-					id: "tes",
-					callback: () => console.log("Test"),
-				},
-			});
+			//@ts-ignore
+			const a = this.app;
+			console.log(a);
 		});
 
 		this.addCommand({
@@ -53,10 +42,14 @@ export default class EfrosinePlugin extends Plugin {
 			},
 		});
 
-		new CommandEngine(this).loadCommands();
+		new CommandManager(this).loadCommands();
 
 		this.registerEvent(
-			this.app.workspace.on("editor-change", () => this.updateMtime())
+			this.app.workspace.on("editor-change", () =>
+				new FrontmatterManager({ app: this.app }).updateMtime(
+					this.settings
+				)
+			)
 		);
 	}
 
@@ -70,50 +63,5 @@ export default class EfrosinePlugin extends Plugin {
 
 	public async saveSettings(setting: EfrosineSettings) {
 		await this.saveData(setting);
-	}
-
-	public async saveFmSetting(fmSettings: FrontmatterField[]) {
-		this.settings.fmFields = fmSettings;
-		await this.saveData(this.settings);
-	}
-
-	public async saveMacroSetting(macroSettings: MacroField[]) {
-		this.settings.macros = macroSettings;
-		await this.saveData(this.settings);
-	}
-
-	private async updateMtime() {
-		await new Promise((resolve) => setTimeout(resolve, 1000));
-		const file = this.app.workspace.getActiveFile();
-		if (file) {
-			const mtime = file.stat.mtime;
-			const fmEngine = new FrontmatterManager({ app: this.app });
-
-			const fm = fmEngine.getCurFm(file);
-			const fmFieldSetting = this.settings.fmFields;
-
-			const filteredFm = fmFieldSetting.filter((field) => {
-				return field.dateOptions === DateOptions.MTime;
-			});
-
-			if (!fm) {
-				return;
-			}
-
-			Object.entries(fm).forEach(([k, v]) => {
-				filteredFm.forEach((field) => {
-					if (k === field.name) {
-						const formated = moment(mtime).format(
-							field.type === "date"
-								? DateFormat.Date
-								: DateFormat.DateTime
-						);
-						fmEngine.updateFm(file, {
-							[k]: formated,
-						});
-					}
-				});
-			});
-		}
 	}
 }

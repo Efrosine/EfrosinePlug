@@ -1,7 +1,7 @@
 import { App, Notice, TFile, FrontMatterCache, moment } from "obsidian";
 import * as yaml from "js-yaml";
-import { FrontmatterField } from "configs/coreConfig";
-import { DateFormat, DateOptions, FmFieldType } from "configs/enums";
+import { EfrosineSettings, FrontmatterField } from "core/coreConfig";
+import { DateFormat, DateOptions, FmFieldType } from "core/enums";
 
 interface FrontmatterManagerParams {
 	app: App;
@@ -14,21 +14,37 @@ export class FrontmatterManager {
 		this.app = app;
 	}
 
-	replaceFm(content: string, newFm: string): string {
-		return content.replace(/^---\n([\s\S]*?)\n---\n/, `---\n${newFm}---\n`);
+	/**
+	 * Replaces the front matter in the given content with the new front matter.
+	 *
+	 * @param content - The original content with front matter.
+	 * @param newFrontmatter - The new front matter to replace the original front matter.
+	 * @returns The content with the replaced front matter.
+	 */
+	swapFrontMatter(content: string, newFrontmatter: string): string {
+		return content.replace(
+			/^---\n([\s\S]*?)\n---\n/,
+			`---\n${newFrontmatter}---\n`
+		);
 	}
 
-	public async addFm(file: TFile, field: FrontmatterField) {
+	/**
+	 * Inserts the front matter field to the given file.
+	 *
+	 * @param file - The file to insert the front matter field.
+	 * @param field - The front matter field to insert.
+	 */
+	public async insertFrontmatter(file: TFile, field: FrontmatterField) {
+		const { vault } = this.app;
 		if (!file) {
 			new Notice("No file is open");
 			return;
 		}
 
-		let content = await this.app.vault.read(file);
+		let content = await vault.read(file);
 
 		let newContent: string;
 		let newFm: { [key: string]: any } = { [field.name]: null };
-		let newFmString;
 
 		if (field.dateOptions === DateOptions.CTime) {
 			const rawCTime = file.stat.ctime;
@@ -44,42 +60,99 @@ export class FrontmatterManager {
 		}
 
 		const fmMatch = content.match(/^---\n([\s\S]*?)\n---\n/);
+		let newFmString;
 		if (fmMatch) {
 			const existingFm = yaml.load(
 				fmMatch[0].replace(/---/g, "")
 			) as FrontMatterCache;
 			const mergedFm = { ...existingFm, ...newFm };
 			newFmString = yaml.dump(mergedFm);
-			newContent = this.replaceFm(content, newFmString);
+			newContent = this.swapFrontMatter(content, newFmString);
 		} else {
 			newFmString = yaml.dump(newFm);
 			newContent = `---\n${newFmString}---\n${content}`;
 		}
-		await this.app.vault.modify(file, newContent);
+		await vault.modify(file, newContent);
 		new Notice("Frontmatter Added");
 	}
 
-	public async updateFm(file: TFile, newFm: Record<string, any>) {
+	/**
+	 * Updates the front matter of the given file with the new front matter.
+	 *
+	 * @param file - The file to update the front matter.
+	 * @param newField - The new front matter to update.
+	 */
+	public async updateFrontMatter(file: TFile, newField: Record<string, any>) {
+		const { vault } = this.app;
 		if (!file) {
 			new Notice("No file is open");
 			return;
 		}
 
-		let content = await this.app.vault.read(file);
+		let content = await vault.read(file);
 
-		let curFm = this.getCurFm(file);
+		let curFm = this.getCurrentField(file);
 		if (!curFm) {
 			new Notice("No frontmatter found");
 			return;
 		}
 
-		const mergedFm = { ...curFm, ...newFm };
+		const mergedFm = { ...curFm, ...newField };
 		const newFmsString = yaml.dump(mergedFm);
-		const newContent = this.replaceFm(content, newFmsString);
-		await this.app.vault.modify(file, newContent);
+		const newContent = this.swapFrontMatter(content, newFmsString);
+		await vault.modify(file, newContent);
 	}
 
-	public getCurFm(file: TFile) {
+	/**
+	 * Gets the current front matter of the given file.
+	 *
+	 * @param file - The file to get the front matter.
+	 * @returns The front matter of the given file.
+	 */
+	public getCurrentField(file: TFile) {
 		return this.app.metadataCache.getFileCache(file)?.frontmatter;
+	}
+
+	/**
+	 * Updates the modification time (mtime) field in the front matter of the active file.
+	 *
+	 * @param settings - The EfrosineSettings object containing the front matter field settings.
+	 * @returns A Promise that resolves after the mtime field is updated.
+	 */
+	public async updateMtime(settings: EfrosineSettings) {
+		const { app } = this;
+
+		await new Promise((resolve) => setTimeout(resolve, 1000));
+
+		const file = app.workspace.getActiveFile();
+		if (!file) return;
+		const mtime = file.stat.mtime;
+
+		const fmEngine = new FrontmatterManager({ app });
+		const currentFm = fmEngine.getCurrentField(file);
+		const fmFieldSetting = settings.fmFields;
+
+		if (!currentFm) {
+			return;
+		}
+
+		const filteredFm = fmFieldSetting.filter((field) => {
+			return field.dateOptions === DateOptions.MTime;
+		});
+
+		Object.entries(currentFm).forEach(([k, v]) => {
+			filteredFm.forEach((field) => {
+				if (k === field.name) {
+					const formattedTime = moment(mtime).format(
+						field.type === "date"
+							? DateFormat.Date
+							: DateFormat.DateTime
+					);
+					fmEngine.updateFrontMatter(file, {
+						[k]: formattedTime,
+					});
+				}
+			});
+		});
 	}
 }

@@ -1,12 +1,8 @@
-import {
-	SequenceFunction,
-	CaptureFunction,
-	MacroField,
-} from "configs/coreConfig";
+import { SequenceFunction, CaptureFunction, MacroField } from "core/coreConfig";
 import EfrosinePlugin from "main";
 import { App, Command } from "obsidian";
-import { CaptureFileEngine } from "./captureFileEngine";
-export class CommandEngine {
+import { CaptureManager } from "./captureManager";
+export class CommandManager {
 	private app: App;
 	private plugin: EfrosinePlugin;
 	constructor(plugin: EfrosinePlugin) {
@@ -18,8 +14,8 @@ export class CommandEngine {
 		this.plugin.addCommand({
 			id: field.name,
 			name: field.name,
-			callback: async () => {
-				await new FuntionExecutor(this.plugin).execute(field);
+			callback: () => {
+				new CommandExecutor(this.plugin).execute(field);
 			},
 		});
 	}
@@ -29,13 +25,13 @@ export class CommandEngine {
 		return this.app.commands.listCommands();
 	}
 
-	private formatCommandId(id: string): string {
-		return "efrosine-plug:" + id;
-	}
-
 	public findCommand(id: string): Command {
 		//@ts-ignore
 		return this.app.commands.findCommand(id);
+	}
+
+	private formatCommandId(id: string): string {
+		return "efrosine-plug:" + id;
 	}
 
 	public removeCommand(id: string) {
@@ -48,7 +44,7 @@ export class CommandEngine {
 	}
 
 	public loadCommands() {
-		const macroFields = this.plugin.settings.macros.filter(
+		const macroFields = this.plugin.settings.macroFields.filter(
 			(field) => field.addToCommand
 		);
 		macroFields.forEach((field) => {
@@ -56,30 +52,34 @@ export class CommandEngine {
 		});
 	}
 
-	public executeCommand(id: string) {
+	public async executeCommandById(id: string) {
 		//@ts-ignore
-		this.app.commands.executeCommandById(id);
+		await this.app.commands.executeCommandById(id);
+	}
+	public async executeCommand(cmd: Command) {
+		// @ts-ignore
+		await this.app.commands.executeCommand(cmd);
 	}
 }
 
-class FuntionExecutor {
+class CommandExecutor {
 	private plugin: EfrosinePlugin;
 
 	constructor(plugin: EfrosinePlugin) {
 		this.plugin = plugin;
 	}
 
-	public async execute(field: MacroField) {
-		// console.log(field);
+	public execute(field: MacroField) {
 		if (isCaptureFunction(field.funcions)) {
-			// console.log("Capture Function");
-			new CaptureFileEngine({
+			new CaptureManager({
 				plugin: this.plugin,
 				macroField: field,
-				// func: field.funcions,
 			}).call();
 		} else if (isSequenceFunction(field.funcions)) {
-			console.log("Sequence Function");
+			field.funcions.value.forEach(
+				async (func) =>
+					await new CommandManager(this.plugin).executeCommand(func)
+			);
 		}
 	}
 }

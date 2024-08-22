@@ -9,10 +9,12 @@
 .no-line{
     border: none;
 }
-.efro-setting-field .full-width {
+ .full-width {
     flex: 1;
 
 }
+
+
 
 .efro-label {
     margin-right: 12px;
@@ -61,5 +63,41 @@ font-size: small;
 .end-div button{
     display: inline-block;
 }
+
+.mod-nav{
+    display: flex;
+    flex-direction: column;
+    background-color: var(--interactive-accent);
+    color:var(--text-on-accent);
+    border: 2px solid white;
+    margin:4px;
+    border-radius: 8px;
+    padding: 8px;
+}
+
+.but-right .mod-nav{
+    align-items: end;
+}
+
+.mod-nav > p{
+    margin: 0;
+}
+
+.mod-nav > p:last-child {
+    font-size: 1.5em;
+    font-weight: 600;
+}
+
+.but-left{
+    display: flex;
+    justify-content: flex-start;
+}
+
+.but-right{
+    display: flex;
+    justify-content: flex-end;
+}
+
+
 
 

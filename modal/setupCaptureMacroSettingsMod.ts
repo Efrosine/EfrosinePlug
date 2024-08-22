@@ -1,26 +1,22 @@
-import {
-	CaptureFunction,
-	EfrosineSettings,
-	MacroField,
-} from "configs/coreConfig";
-import { CaptureInsertWhere } from "configs/enums";
+import { CaptureFunction, EfrosineSettings, MacroField } from "core/coreConfig";
+import { CaptureInsertWhere } from "core/enums";
 import EfrosinePlugin from "main";
-import { Modal, Notice, Setting } from "obsidian";
-import { FileSugest } from "manager/fileSugest";
-import { CommandEngine } from "manager/commandEngine";
+import { Modal, Setting } from "obsidian";
+import { FileSuggester } from "helper/inputSuggester";
+import { CommandManager } from "manager/commandManager";
 
-interface SetupCaptureMacroSettigsModParams {
+interface MacroCaptureSetupModParams {
 	plugin: EfrosinePlugin;
 	macroField: MacroField;
 }
-export class SetupCaptureMacroSettingsMod extends Modal {
+export class MacroCaptureSetupMod extends Modal {
 	private plugin: EfrosinePlugin;
 	private setting: EfrosineSettings;
 	private macroField: MacroField;
 	private captureFunction: CaptureFunction;
 	private resolvePromise: (val?: unknown) => void;
 
-	constructor({ plugin, macroField }: SetupCaptureMacroSettigsModParams) {
+	constructor({ plugin, macroField }: MacroCaptureSetupModParams) {
 		super(plugin.app);
 		this.plugin = plugin;
 		this.setting = this.plugin.settings;
@@ -62,8 +58,8 @@ export class SetupCaptureMacroSettingsMod extends Modal {
 			})
 			.addEventListener("click", () => {
 				this.macroField.funcions = this.captureFunction;
-				let index = this.setting.macros.indexOf(this.macroField);
-				this.setting.macros[index] = this.macroField;
+				let index = this.setting.macroFields.indexOf(this.macroField);
+				this.setting.macroFields[index] = this.macroField;
 
 				this.plugin.saveSettings(this.setting);
 				this.close();
@@ -85,10 +81,8 @@ export class SetupCaptureMacroSettingsMod extends Modal {
 			.addToggle((toggle) => {
 				toggle.setValue(macroField.addToCommand);
 				toggle.onChange((value) => {
-					console.log("toggle value : ", value);
-
 					this.macroField.addToCommand = value;
-					const commandEngine = new CommandEngine(this.plugin);
+					const commandEngine = new CommandManager(this.plugin);
 					if (value) {
 						commandEngine.addCommand(macroField);
 					} else {
@@ -111,8 +105,8 @@ export class SetupCaptureMacroSettingsMod extends Modal {
 		if (!this.captureFunction.toActiveFile) {
 			new Setting(contentEl).setName("File path").addSearch((search) => {
 				search.setPlaceholder("File path");
-				const filesug = new FileSugest(
-					this.app,
+				const filesug = new FileSuggester(
+					this.plugin,
 					search.inputEl
 				).onSelect((value) => {
 					search.inputEl.value = value.path;

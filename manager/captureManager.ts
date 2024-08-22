@@ -1,19 +1,19 @@
-import { CaptureFunction, MacroField } from "configs/coreConfig";
-import { CaptureInsertWhere } from "configs/enums";
+import { CaptureFunction, MacroField } from "core/coreConfig";
+import { CaptureInsertWhere } from "core/enums";
 
 import EfrosinePlugin from "main";
 import { Notice } from "obsidian";
 
-interface CaptureFileEngineParams {
+interface CaptureManagerParams {
 	plugin: EfrosinePlugin;
 	macroField: MacroField;
 }
-export class CaptureFileEngine {
+export class CaptureManager {
 	marcroField: MacroField;
 	plugin: EfrosinePlugin;
 	func: CaptureFunction;
 
-	constructor({ plugin, macroField }: CaptureFileEngineParams) {
+	constructor({ plugin, macroField }: CaptureManagerParams) {
 		this.plugin = plugin;
 		this.marcroField = macroField;
 		this.func = this.marcroField.funcions as CaptureFunction;

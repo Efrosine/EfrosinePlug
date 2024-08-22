@@ -1,10 +1,7 @@
 import EfrosinePlugin from "../main";
-import { Modal, Notice } from "obsidian";
-import { DateOptions, FmFieldType } from "../configs/enums";
-import { InputTextEl } from "./modComponent/inputTextEl";
-import { InputDropdwonEl } from "./modComponent/inputDropdownEl";
-import { InputSelectEl } from "./modComponent/inputSelectEl";
-import { EfrosineSettings, FrontmatterField } from "../configs/coreConfig";
+import { Modal, Notice, Setting } from "obsidian";
+import { DateOptions, FmFieldType } from "../core/enums";
+import { EfrosineSettings, FrontmatterField } from "../core/coreConfig";
 
 interface AddFmSettingsModParams {
 	plugin: EfrosinePlugin;
@@ -45,7 +42,7 @@ export class AddFmSettingsMod extends Modal {
 		this.loadField();
 		const { contentEl, titleEl, modalEl } = this;
 		titleEl.setText("Add Frontmatter Field");
-		this.onRebuild(contentEl);
+		this.onRebuild();
 
 		const footerEl = modalEl.createDiv({ cls: "efro-footer-actions" });
 
@@ -83,52 +80,87 @@ export class AddFmSettingsMod extends Modal {
 		this.resolvePromise();
 	}
 
-	onRebuild(contentEl: HTMLElement): void {
+	onRebuild(): void {
+		const { contentEl } = this;
 		contentEl.empty();
 
 		//Name Field
-
 		if (this.fmField.type === FmFieldType.Tags) {
 			this.fmField.name = "tags";
 		}
-		const nameDiv = new InputTextEl({
-			parent: contentEl,
-			label: "Name",
-			value: this.fmField.name,
-			disable: this.fmField.type === FmFieldType.Tags,
-		}).create((value) => {
-			this.fmField.name = value;
-		});
 
-		contentEl.appendChild(nameDiv);
+		new Setting(contentEl).setName("Name :").addText((text) =>
+			text
+				.setPlaceholder("inupt name")
+				.setValue(this.fmField.name)
+				.onChange((value) => (this.fmField.name = value))
+				.setDisabled(this.fmField.type === FmFieldType.Tags)
+				.inputEl.classList.add("full-width")
+		);
 
 		//Type Field
-		const typeMap = new Map<string, string>();
-		Object.entries(FmFieldType).forEach(([key, value]) => {
-			typeMap.set(key, value);
-		});
-		const typeDiv = new InputDropdwonEl({
-			parent: contentEl,
-			label: "Type",
-			option: typeMap,
-			selected: this.fmField.type,
-		}).create((value) => {
-			this.fmField.type = value as FmFieldType;
-			this.onRebuild(contentEl);
-		});
-		contentEl.appendChild(typeDiv);
+		new Setting(contentEl).setName("Type :").addDropdown((dropdown) =>
+			dropdown
+				.addOptions(
+					Object.fromEntries(
+						Object.entries(FmFieldType).map(([key, val]) => [
+							val as string,
+							key,
+						])
+					)
+				)
+				.setValue(this.fmField.type)
+				.onChange((value) => {
+					this.fmField.type = value as FmFieldType;
+					this.onRebuild();
+				})
+		);
 
 		//Select Field
 		if (this.fmField.type === FmFieldType.Select) {
-			const selectDiv = new InputSelectEl({
-				parent: contentEl,
-				label: "Options",
-				option: this.fmField.options ?? [],
-			}).create((value) => {
-				this.fmField.options = value;
-				this.onRebuild(contentEl);
-			});
-			contentEl.appendChild(selectDiv);
+			this.fmField.options = this.fmField.options ?? [];
+			let optionValue = "";
+			new Setting(contentEl)
+				.setName("Options :")
+				.addText((text) =>
+					text
+						.setPlaceholder("insert option")
+						.onChange((value) => (optionValue = value))
+						.inputEl.classList.add("full-width")
+				)
+				.addButton((button) =>
+					button
+						.setButtonText("Add Option")
+						.setClass("mod-cta")
+						.onClick(() => {
+							this.fmField.options?.push(optionValue);
+							this.onRebuild();
+						})
+				);
+
+			for (let idx = 0; idx < this.fmField.options.length; idx++) {
+				let field = this.fmField.options[idx];
+				new Setting(contentEl)
+					.setClass("no-line")
+					.addText((text) =>
+						text
+							.setValue(field)
+							.onChange((value) => {
+								field = value;
+								this.fmField.options![idx] = field;
+							})
+							.inputEl.classList.add("full-width")
+					)
+					.addButton((button) =>
+						button
+							.setIcon("trash")
+							.setClass("mod-warning")
+							.onClick(() => {
+								this.fmField.options?.remove(field);
+								this.onRebuild();
+							})
+					);
+			}
 		}
 
 		//Date and DateTime Field
@@ -136,21 +168,24 @@ export class AddFmSettingsMod extends Modal {
 			this.fmField.type === FmFieldType.Date ||
 			this.fmField.type === FmFieldType.DateTime
 		) {
-			const dateDiv = new InputDropdwonEl({
-				parent: contentEl,
-				label: "Default Value",
-				option: new Map(
-					Object.entries(DateOptions).map(([key, value]) => [
-						key,
-						value,
-					])
-				),
-				selected: this.fmField.dateOptions ?? DateOptions.Now,
-			}).create((value) => {
-				this.fmField.dateOptions = value as DateOptions;
-			});
-
-			contentEl.appendChild(dateDiv);
+			new Setting(contentEl)
+				.setName("Default Value :")
+				.setClass("no-line")
+				.addDropdown((dropdown) =>
+					dropdown
+						.addOptions(
+							Object.fromEntries(
+								Object.entries(DateOptions).map(
+									([key, val]) => [val as string, key]
+								)
+							)
+						)
+						.setValue(this.fmField.dateOptions ?? DateOptions.Now)
+						.onChange((value) => {
+							this.fmField.dateOptions = value as DateOptions;
+							this.onRebuild();
+						})
+				);
 		}
 	}
 }

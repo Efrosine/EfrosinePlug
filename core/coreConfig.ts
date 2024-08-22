@@ -5,15 +5,16 @@ import {
 	FmFieldType,
 	MacroType,
 } from "./enums";
+import { ButtonField } from "entity/buttonField";
 export interface EfrosineSettings {
 	fmFields: FrontmatterField[];
-	macros: MacroField[];
-	buttons: ButtonField[];
+	macroFields: MacroField[];
+	buttonFields: ButtonField[];
 }
 export const DEFAULT_SETTINGS: EfrosineSettings = {
 	fmFields: [],
-	macros: [],
-	buttons: [],
+	macroFields: [],
+	buttonFields: [],
 };
 export interface FrontmatterField {
 	name: string;
@@ -22,13 +23,11 @@ export interface FrontmatterField {
 	dateOptions?: DateOptions;
 }
 
-type CombineFunction = CaptureFunction | SequenceFunction;
-
 export interface MacroField {
 	name: string;
 	type: MacroType;
 	addToCommand: boolean;
-	funcions?: CombineFunction;
+	funcions?: CaptureFunction | SequenceFunction;
 }
 
 export interface CaptureFunction {
@@ -42,10 +41,4 @@ export interface CaptureFunction {
 
 export interface SequenceFunction {
 	value: Command[];
-}
-
-export interface ButtonField {
-	name: string;
-	position: string;
-	command: Command;
 }

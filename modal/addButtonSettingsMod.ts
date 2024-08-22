@@ -1,7 +1,9 @@
-import { ButtonField, EfrosineSettings } from "configs/coreConfig";
-import { CommandSugest } from "manager/fileSugest";
+import { EfrosineSettings } from "core/coreConfig";
+import { CommandSugest } from "../helper/inputSuggester";
 import EfrosinePlugin from "main";
 import { Modal, Notice, Setting } from "obsidian";
+import { ButtonField } from "entity/buttonField";
+import { ButtonPosition, ButtonType } from "core/enums";
 
 interface AddButtonSettingsModParams {
 	plugin: EfrosinePlugin;
@@ -28,18 +30,11 @@ export class AddButtonSettingsMod extends Modal {
 	}
 
 	loadField(btField?: ButtonField): void {
-		console.log("btfield", btField);
-		this.buttonField = btField ?? {
-			name: "",
-			position: "",
-			command: { name: "", id: "" },
-		};
-		console.log("this.buttonField", this.buttonField);
+		this.buttonField = btField ?? ButtonField.empty();
 		this.setting = this.plugin.settings;
 	}
 
 	onOpen(): void {
-		// this.loadField();
 		const { contentEl, titleEl, modalEl } = this;
 		titleEl.setText("Add Button Field");
 		this.onRebuild(contentEl);
@@ -58,11 +53,11 @@ export class AddButtonSettingsMod extends Modal {
 			}
 
 			if (this.buttonField) {
-				let index = this.setting.buttons.indexOf(this.buttonField);
+				let index = this.setting.buttonFields.indexOf(this.buttonField);
 				if (index !== -1) {
-					this.setting.buttons[index] = this.buttonField;
+					this.setting.buttonFields[index] = this.buttonField;
 				} else {
-					this.setting.buttons.push(this.buttonField);
+					this.setting.buttonFields.push(this.buttonField);
 				}
 			}
 
@@ -78,7 +73,7 @@ export class AddButtonSettingsMod extends Modal {
 	}
 
 	onRebuild(contentEl: HTMLElement): void {
-		const { name, position, command } = this.buttonField;
+		const { name, position, type, command } = this.buttonField;
 
 		new Setting(contentEl).setName("Name").addText((text) =>
 			text
@@ -87,15 +82,41 @@ export class AddButtonSettingsMod extends Modal {
 				.onChange((value) => (this.buttonField.name = value))
 		);
 
-		new Setting(contentEl).setName("Position").addDropdown((dropdown) =>
+		new Setting(contentEl).setName("Type").addDropdown((dropdown) =>
 			dropdown
-				.addOptions({ left: "Left", right: "Right" })
-				.setValue(position)
-				.onChange((value) => (this.buttonField.position = value))
+				.addOptions(
+					Object.fromEntries(
+						Object.entries(ButtonType).map(([key, value]) => [
+							value as string,
+							key,
+						])
+					)
+				)
+				.setValue(type)
+				.onChange(
+					(value) => (this.buttonField.type = value as ButtonType)
+				)
 		);
 
-		new Setting(contentEl).setName("Command Id").addSearch((search) => {
-			search.setPlaceholder("Command Id").setValue(command.name);
+		new Setting(contentEl).setName("Position").addDropdown((dropdown) =>
+			dropdown
+				.addOptions(
+					Object.fromEntries(
+						Object.entries(ButtonPosition).map(([key, value]) => [
+							value as string,
+							key,
+						])
+					)
+				)
+				.setValue(position)
+				.onChange(
+					(value) =>
+						(this.buttonField.position = value as ButtonPosition)
+				)
+		);
+
+		new Setting(contentEl).setName("Command").addSearch((search) => {
+			search.setPlaceholder("Command").setValue(command.name);
 			const cmdSug = new CommandSugest(
 				this.plugin,
 				search.inputEl
@@ -103,6 +124,9 @@ export class AddButtonSettingsMod extends Modal {
 				search.inputEl.value = value.name;
 				this.buttonField.command = value;
 				cmdSug.close();
+			});
+			search.clearButtonEl.addEventListener("click", () => {
+				search.inputEl.focus();
 			});
 		});
 	}
