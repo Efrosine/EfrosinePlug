@@ -1,14 +1,11 @@
-import { getLinkpath, Notice, parseLinktext, Plugin } from "obsidian";
-
-import { SettingsTab } from "./core/configTab";
-import { FmOptionMod } from "./modal/fmOptionsMod";
-import { EfrosineSettings, DEFAULT_SETTINGS } from "./core/coreConfig";
-
-import { FrontmatterManager } from "./manager/frontmatterManager";
-import { CommandManager } from "manager/commandManager";
-import { ButtonManager } from "manager/buttonManager";
+import { Notice, Plugin } from "obsidian";
+import { SettingsTab } from "core/configTab";
+import { FmOptionCommandMod } from "modal/commandMod/fmOptionCommandMod";
+import { EfrosineSettings, DEFAULT_SETTINGS } from "core/coreConfig";
+import { FrontmatterManager } from "manager/frontmatterManager";
 import { PostProcessorManager } from "manager/postProcessorManager";
-import { InsertButtonMod } from "modal/insertButtonMod";
+import { ButtonCommandMod } from "modal/commandMod/buttonCommandMod";
+import { CommandManager } from "manager/commandManager";
 
 export default class EfrosinePlugin extends Plugin {
 	settings: EfrosineSettings;
@@ -33,7 +30,7 @@ export default class EfrosinePlugin extends Plugin {
 			id: "efrosine-open-fromatter-setting",
 			name: "Open Frontmatter Setting",
 			editorCallback: () => {
-				new FmOptionMod({ plugin: this }).open();
+				new FmOptionCommandMod({ plugin: this }).open();
 			},
 		});
 
@@ -41,7 +38,7 @@ export default class EfrosinePlugin extends Plugin {
 			name: "Add Button",
 			id: "add-button",
 			editorCallback: (e, m) => {
-				new InsertButtonMod(this).open();
+				new ButtonCommandMod(this).open();
 			},
 		});
 
@@ -60,11 +57,11 @@ export default class EfrosinePlugin extends Plugin {
 		new Notice("Unloading plugin");
 	}
 
-	public async loadSettings(): Promise<EfrosineSettings> {
+	async loadSettings(): Promise<EfrosineSettings> {
 		return Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
 	}
 
-	public async saveSettings(setting: EfrosineSettings) {
+	async saveSettings(setting: EfrosineSettings) {
 		await this.saveData(setting);
 	}
 }

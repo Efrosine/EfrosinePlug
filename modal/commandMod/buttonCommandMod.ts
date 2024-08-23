@@ -1,9 +1,9 @@
-import { ButtonManager } from "manager/buttonManager";
-import EfrosinePlugin from "main";
 import { SuggestModal } from "obsidian";
+import EfrosinePlugin from "main";
+import { ButtonManager } from "manager/buttonManager";
 import { ButtonField } from "entity/buttonField";
 
-export class InsertButtonMod extends SuggestModal<ButtonField> {
+export class ButtonCommandMod extends SuggestModal<ButtonField> {
 	plugin: EfrosinePlugin;
 
 	constructor(plugin: EfrosinePlugin) {

@@ -1,20 +1,20 @@
-import EfrosinePlugin from "../main";
 import { Modal, Notice, Setting } from "obsidian";
-import { DateOptions, FmFieldType } from "../core/enums";
-import { EfrosineSettings, FrontmatterField } from "../core/coreConfig";
+import EfrosinePlugin from "main";
+import { DateOptions, FmFieldType } from "core/enums";
+import { EfrosineSettings, FrontmatterField } from "core/coreConfig";
 
-interface AddFmSettingsModParams {
+interface FmSettingModParams {
 	plugin: EfrosinePlugin;
 	fmField?: FrontmatterField;
 }
 
-export class AddFmSettingsMod extends Modal {
+export class FmSettingMod extends Modal {
 	private plugin: EfrosinePlugin;
 	private setting: EfrosineSettings;
 	private fmField: FrontmatterField;
 	private resolvePromise: (val?: unknown) => void;
 
-	constructor({ plugin, fmField }: AddFmSettingsModParams) {
+	constructor({ plugin, fmField }: FmSettingModParams) {
 		super(plugin.app);
 		this.plugin = plugin;
 		this.fmField = fmField ?? this.loadField();
@@ -27,20 +27,9 @@ export class AddFmSettingsMod extends Modal {
 		});
 	}
 
-	loadField(): FrontmatterField {
-		this.fmField = this.fmField ?? {
-			name: "",
-			type: FmFieldType.Text,
-			options: null,
-			dateOptions: null,
-		};
-		this.setting = this.plugin.settings;
-		return this.fmField;
-	}
-
 	onOpen(): void {
 		this.loadField();
-		const { contentEl, titleEl, modalEl } = this;
+		const { titleEl, modalEl } = this;
 		titleEl.setText("Add Frontmatter Field");
 		this.onRebuild();
 
@@ -80,7 +69,18 @@ export class AddFmSettingsMod extends Modal {
 		this.resolvePromise();
 	}
 
-	onRebuild(): void {
+	private loadField(): FrontmatterField {
+		this.fmField = this.fmField ?? {
+			name: "",
+			type: FmFieldType.Text,
+			options: null,
+			dateOptions: null,
+		};
+		this.setting = this.plugin.settings;
+		return this.fmField;
+	}
+
+	private onRebuild(): void {
 		const { contentEl } = this;
 		contentEl.empty();
 

@@ -1,10 +1,9 @@
+import { Notice } from "obsidian";
+import EfrosinePlugin from "main";
 import { CaptureFunction, MacroField } from "core/coreConfig";
 import { CaptureInsertWhere } from "core/enums";
-
-import EfrosinePlugin from "main";
-import { Notice } from "obsidian";
-import { FrontmatterManager } from "./frontmatterManager";
-import { NoteManager } from "./noteManager";
+import { FrontmatterManager } from "manager/frontmatterManager";
+import { NoteManager } from "manager/noteManager";
 
 interface CaptureManagerParams {
 	plugin: EfrosinePlugin;
@@ -21,18 +20,19 @@ export class CaptureManager {
 		this.func = this.marcroField.funcions as CaptureFunction;
 	}
 
-	public async call() {
+	async call() {
 		const { app } = this.plugin;
 		const file = app.workspace.getActiveFile();
-		if (!file) {
-			throw new Error("file not found");
-		}
+		if (!file) throw new Error("file not found");
+
 		const noteManager = new NoteManager(app);
 		const content = await app.vault.read(file);
-		let newContent = content;
-		let target = NoteManager.contentToArray(content);
 		const regex = this.func.insertRegEx;
 		let insertPos = 0;
+
+		let newContent = content;
+		let target = NoteManager.contentToArray(content);
+
 		switch (this.func.inssertWhere) {
 			case CaptureInsertWhere.Cursor:
 				const editor = app.workspace.activeEditor?.editor;
@@ -69,6 +69,7 @@ export class CaptureManager {
 				new Notice("Insert Where not valid");
 				return;
 		}
+
 		target.splice(insertPos, 0, this.func.value);
 		newContent = NoteManager.arrayToContent(target);
 		noteManager.modifyContent(file, newContent);

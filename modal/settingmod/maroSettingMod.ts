@@ -1,40 +1,27 @@
+import { Modal, Setting } from "obsidian";
+import EfrosinePlugin from "main";
 import { CaptureFunction, EfrosineSettings, MacroField } from "core/coreConfig";
 import { CaptureInsertWhere } from "core/enums";
-import EfrosinePlugin from "main";
-import { Modal, Setting } from "obsidian";
-import { FileSuggester } from "helper/inputSuggester";
+import { FileSuggester } from "helper/suggester";
 import { CommandManager } from "manager/commandManager";
 
-interface MacroCaptureSetupModParams {
+interface MacroCaptureSettingModParams {
 	plugin: EfrosinePlugin;
 	macroField: MacroField;
 }
-export class MacroCaptureSetupMod extends Modal {
+export class MacroCaptureSettingMod extends Modal {
 	private plugin: EfrosinePlugin;
 	private setting: EfrosineSettings;
 	private macroField: MacroField;
 	private captureFunction: CaptureFunction;
 	private resolvePromise: (val?: unknown) => void;
 
-	constructor({ plugin, macroField }: MacroCaptureSetupModParams) {
+	constructor({ plugin, macroField }: MacroCaptureSettingModParams) {
 		super(plugin.app);
 		this.plugin = plugin;
 		this.setting = this.plugin.settings;
 		this.macroField = macroField;
 		this.captureFunction = this.loadField();
-	}
-
-	private loadField(): CaptureFunction {
-		return (
-			(this.macroField.funcions as CaptureFunction) ??
-			({
-				toActiveFile: true,
-				filePath: "",
-				inssertWhere: CaptureInsertWhere.Cursor,
-				insertAtEndSection: false,
-				value: "",
-			} as CaptureFunction)
-		);
 	}
 
 	open(): Promise<void> {
@@ -66,6 +53,25 @@ export class MacroCaptureSetupMod extends Modal {
 			});
 	}
 
+	onClose(): void {
+		const { contentEl } = this;
+		contentEl.empty();
+		this.resolvePromise();
+	}
+
+	private loadField(): CaptureFunction {
+		return (
+			(this.macroField.funcions as CaptureFunction) ??
+			({
+				toActiveFile: true,
+				filePath: "",
+				inssertWhere: CaptureInsertWhere.Cursor,
+				insertAtEndSection: false,
+				value: "",
+			} as CaptureFunction)
+		);
+	}
+
 	private onRebuild(): void {
 		const { macroField, contentEl } = this;
 		contentEl.empty();
@@ -75,6 +81,7 @@ export class MacroCaptureSetupMod extends Modal {
 				this.macroField.name = value;
 			});
 		});
+
 		new Setting(contentEl)
 			.setName("Add to Command")
 			.setClass("no-line")
@@ -90,6 +97,7 @@ export class MacroCaptureSetupMod extends Modal {
 					}
 				});
 			});
+
 		new Setting(contentEl)
 			.setName("To Active File")
 			.setDesc("File to capture to")
@@ -136,13 +144,12 @@ export class MacroCaptureSetupMod extends Modal {
 				});
 			});
 
-		if (
-			this.captureFunction.inssertWhere === CaptureInsertWhere.Replace ||
-			this.captureFunction.inssertWhere ===
-				CaptureInsertWhere.InsertAfter ||
-			this.captureFunction.inssertWhere ===
-				CaptureInsertWhere.InsertBefore
-		) {
+		const isNeedRegex = [
+			CaptureInsertWhere.Replace,
+			CaptureInsertWhere.InsertAfter,
+			CaptureInsertWhere.InsertBefore,
+		];
+		if (isNeedRegex.includes(this.captureFunction.inssertWhere)) {
 			new Setting(contentEl)
 				.setName("Insert Regex")
 				.setClass("no-line")
@@ -177,11 +184,5 @@ export class MacroCaptureSetupMod extends Modal {
 					this.captureFunction.value = value;
 				});
 			});
-	}
-
-	onClose(): void {
-		const { contentEl } = this;
-		contentEl.empty();
-		this.resolvePromise();
 	}
 }

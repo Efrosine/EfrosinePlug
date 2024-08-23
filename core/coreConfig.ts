@@ -4,7 +4,7 @@ import {
 	DateOptions,
 	FmFieldType,
 	MacroType,
-} from "./enums";
+} from "core/enums";
 import { ButtonField } from "entity/buttonField";
 export interface EfrosineSettings {
 	fmFields: FrontmatterField[];

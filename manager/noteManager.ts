@@ -19,11 +19,11 @@ export class NoteManager {
 		return arr.findIndex((line) => line.includes(regex));
 	}
 
-	public modifyContent(file: TFile, newContent: string): void {
+	 modifyContent(file: TFile, newContent: string): void {
 		this.app.vault.modify(file, newContent);
 	}
 
-	public openFileByPath(filePath: string): void {
+	 openFileByPath(filePath: string): void {
 		const file = this.app.vault.getFileByPath(filePath);
 		if (!file) {
 			new Notice("File not found");

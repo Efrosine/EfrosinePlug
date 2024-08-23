@@ -1,100 +1,15 @@
-import { Modal, Notice, TFile, SuggestModal } from "obsidian";
-import { FrontmatterManager } from "manager/frontmatterManager";
-import { UpdataFmMod } from "modal/fmOptionsMod";
+import { Notice, TFile, SuggestModal } from "obsidian";
 import EfrosinePlugin from "main";
+import { FrontmatterManager } from "manager/frontmatterManager";
+import { BaseFmInputMod } from "core/baseMod/baseFmInputMod";
 
-class BaseInputFmMod extends Modal {
-	protected title: string;
-	private inputType: string;
-	protected fmEngine: FrontmatterManager;
-	private file: TFile | null;
-	private plugin: EfrosinePlugin;
-
-	constructor(plugin: EfrosinePlugin, title: string, inputType: string) {
-		super(plugin.app);
-		this.plugin = plugin;
-		this.title = title;
-		this.inputType = inputType;
-		this.fmEngine = new FrontmatterManager({ app: this.app });
-		this.file = this.app.workspace.getActiveFile();
-	}
-
-	onOpen(): void {
-		let { contentEl, titleEl } = this;
-
-		contentEl.addEventListener("keydown", (evt: KeyboardEvent) => {
-			if (evt.key === "Escape") {
-				new UpdataFmMod(this.plugin).open();
-			}
-		});
-
-		if (!this.file) {
-			new Notice("No file is open");
-			return;
-		}
-		const curFm = this.fmEngine.getCurrentField(this.file);
-		let value: string = curFm?.[this.title] ?? "";
-
-		contentEl.addEventListener("keydown", (evt: KeyboardEvent) => {
-			if (evt.key === "Enter" && evt.altKey) {
-				this.updateFm(this.file!, value);
-				this.close();
-			}
-		});
-
-		titleEl.setText(`Insert Value of ${this.title}`);
-
-		const inputDiv = contentEl.createDiv({ cls: "efro-setting-field" });
-
-		const inputEl = inputDiv.createEl("input", {
-			cls: "full-width",
-			type: this.inputType,
-			value: value,
-		});
-		inputEl.addEventListener("input", () => {
-			value = inputEl.value;
-		});
-
-		this.createNote(contentEl);
-
-		const footerEl = contentEl.createDiv({ cls: "efro-footer-actions" });
-		footerEl.createEl("p", {
-			text: "Alt + Enter to Insert",
-		});
-
-		const addButton = footerEl.createEl("button", {
-			text: "Insert",
-			cls: "mod-cta",
-		});
-		addButton.addEventListener("click", () => {
-			if (!this.file) {
-				new Notice("No file is open");
-				return;
-			}
-			this.updateFm(this.file, value);
-			this.close();
-		});
-	}
-
-	createNote(contentEl: HTMLElement): void {}
-
-	updateFm(file: TFile, value: string): void {
-		this.fmEngine.updateFrontMatter(file, { [this.title]: value });
-	}
-
-	onClose(): void {
-		let { contentEl } = this;
-		contentEl.empty();
-	}
-}
-
-export class InsertTTextFmMod extends BaseInputFmMod {
+export class FmInputTextMod extends BaseFmInputMod {
 	constructor(plugin: EfrosinePlugin, title: string) {
 		super(plugin, title, "text");
 	}
 }
 
-export class InsertNNumberFmMod extends BaseInputFmMod {
+export class FmInputNumberMod extends BaseFmInputMod {
 	constructor(plugin: EfrosinePlugin, title: string) {
 		super(plugin, title, "number");
 	}
@@ -111,19 +26,19 @@ export class InsertNNumberFmMod extends BaseInputFmMod {
 	}
 }
 
-export class InsertDateCustomFmMod extends BaseInputFmMod {
+export class FmInputDateMod extends BaseFmInputMod {
 	constructor(plugin: EfrosinePlugin, title: string) {
 		super(plugin, title, "date");
 	}
 }
 
-export class InsertDateTimeCustomFmMod extends BaseInputFmMod {
+export class FmInputDateTimeMod extends BaseFmInputMod {
 	constructor(plugin: EfrosinePlugin, title: string) {
 		super(plugin, title, "datetime-local");
 	}
 }
 
-export class InsertListFmMod extends BaseInputFmMod {
+export class FmInputListMod extends BaseFmInputMod {
 	constructor(plugin: EfrosinePlugin, title: string) {
 		super(plugin, title, "text");
 	}
@@ -135,20 +50,19 @@ export class InsertListFmMod extends BaseInputFmMod {
 		this.fmEngine.updateFrontMatter(file, { [this.title]: listValue });
 	}
 
-	createNote(contentEl: HTMLElement): void {
+	footerNote(contentEl: HTMLElement): void {
 		contentEl.createEl("p", {
 			text: "Separate items with comma",
 		});
 	}
 }
 
-export class InsertSelectFmMod extends SuggestModal<string> {
+export class FmInputSelectionMod extends SuggestModal<string> {
 	private options: string[];
 	private title: string;
-	private plugin: EfrosinePlugin;
+
 	constructor(plugin: EfrosinePlugin, title: string, options: string[]) {
 		super(plugin.app);
-		this.plugin = plugin;
 		this.title = title;
 		this.options = options;
 	}

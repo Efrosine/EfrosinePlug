@@ -1,11 +1,12 @@
-import EfrosinePlugin from "../main";
 import { PluginSettingTab, Setting } from "obsidian";
-import { AddFmSettingsMod as AddFmSettingdMod } from "../modal/addFmSettingsMod";
-import { MacroCaptureSetupMod } from "../modal/setupCaptureMacroSettingsMod";
-import { FrontmatterField, MacroField } from "./coreConfig";
-import { FmFieldType, MacroType } from "./enums";
-import { AddButtonSettingsMod } from "modal/addButtonSettingsMod";
+import EfrosinePlugin from "main";
+import { FmSettingMod as AddFmSettingdMod } from "modal/settingmod/fmSettingMod";
+import { MacroCaptureSettingMod } from "modal/settingmod/maroSettingMod";
+import { FrontmatterField, MacroField } from "core/coreConfig";
+import { FmFieldType, MacroType } from "core/enums";
+import { ButtonSettingMod } from "modal/settingmod/buttonSettingMod";
 import { ButtonField } from "entity/buttonField";
+import { SettingsRenderrer } from "core/abstracClass/settingRenderrer";
 
 interface SettingsTabParams {
 	plugin: EfrosinePlugin;
@@ -26,61 +27,21 @@ export class SettingsTab extends PluginSettingTab {
 			text: "Settings for my awesome plugin",
 		});
 
-		this.containerEl.createEl("h3", { text: "Frontmatter Field" });
-		new FrontmatterSettingRenderrer(this, this.plugin).renderItem();
-		this.containerEl.createEl("h3", { text: "Macro Field" });
-		new MacroSettingRenderrer(this, this.plugin).renderItem();
-		this.containerEl.createEl("h3", { text: "Button Field" });
-		new ButtonSettingRendererrer(this, this.plugin).renderItem();
-	}
-}
-
-abstract class SettingsRenderrer<T> {
-	containerEl: HTMLElement;
-	parent: SettingsTab;
-	plugin: EfrosinePlugin;
-
-	constructor(parent: SettingsTab, plugin: EfrosinePlugin) {
-		this.parent = parent;
-		this.containerEl = parent.containerEl;
-		this.plugin = plugin;
-	}
-
-	public renderItem() {
-		const mainDiv = this.containerEl.createDiv();
-		this.renderMainInput(mainDiv);
-		this.renderChildItems(mainDiv);
-	}
-
-	protected abstract renderMainInput(mainDiv: HTMLElement): void;
-
-	protected abstract getNameNDesc(item: T): { name: string; desc: string };
-
-	protected abstract getItems(): T[];
-
-	protected abstract editItem(item: T): void;
-
-	protected abstract deleteItem(item: T): void;
-
-	protected renderChildItems(mainDiv: HTMLElement) {
-		const arrays = this.getItems();
-		for (let field of arrays) {
-			const itemDiv = mainDiv.createDiv();
-			const { name, desc } = this.getNameNDesc(field);
-
-			new Setting(itemDiv)
-				.setName(name)
-				.setDesc(desc)
-				.addButton((button) =>
-					button.setIcon("edit").onClick(() => this.editItem(field))
-				)
-				.addButton((button) =>
-					button
-						.setIcon("trash")
-						.setClass("mod-warning")
-						.onClick(() => this.deleteItem(field))
-				);
-		}
+		new FrontmatterSettingRenderrer(
+			this.plugin,
+			this,
+			"Frontmatter Field"
+		).renderItem();
+		new MacroSettingRenderrer(
+			this.plugin,
+			this,
+			"Macro Field"
+		).renderItem();
+		new ButtonSettingRendererrer(
+			this.plugin,
+			this,
+			"Button Field"
+		).renderItem();
 	}
 }
 
@@ -185,7 +146,7 @@ class MacroSettingRenderrer extends SettingsRenderrer<MacroField> {
 		return this.plugin.settings.macroFields || [];
 	}
 	protected editItem(item: MacroField): void {
-		new MacroCaptureSetupMod({
+		new MacroCaptureSettingMod({
 			plugin: this.plugin,
 			macroField: item,
 		}).open();
@@ -210,7 +171,7 @@ class ButtonSettingRendererrer extends SettingsRenderrer<ButtonField> {
 					.setButtonText("Add Button")
 					.setClass("mod-cta")
 					.onClick(() =>
-						new AddButtonSettingsMod({ plugin: this.plugin })
+						new ButtonSettingMod({ plugin: this.plugin })
 							.open()
 							.then(() => this.parent.display())
 					)
@@ -225,7 +186,7 @@ class ButtonSettingRendererrer extends SettingsRenderrer<ButtonField> {
 		return this.plugin.settings.buttonFields || [];
 	}
 	protected editItem(item: ButtonField): void {
-		new AddButtonSettingsMod({
+		new ButtonSettingMod({
 			plugin: this.plugin,
 			buttonField: item,
 		})

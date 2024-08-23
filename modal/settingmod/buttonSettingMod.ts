@@ -1,22 +1,22 @@
-import { EfrosineSettings } from "core/coreConfig";
-import { CommandSugest } from "../helper/inputSuggester";
-import EfrosinePlugin from "main";
 import { Modal, Notice, Setting } from "obsidian";
+import EfrosinePlugin from "main";
+import { EfrosineSettings } from "core/coreConfig";
+import { CommandSugest } from "helper/suggester";
 import { ButtonField } from "entity/buttonField";
 import { ButtonPosition, ButtonType } from "core/enums";
 
-interface AddButtonSettingsModParams {
+interface ButtonSettingModParams {
 	plugin: EfrosinePlugin;
 	buttonField?: ButtonField;
 }
 
-export class AddButtonSettingsMod extends Modal {
+export class ButtonSettingMod extends Modal {
 	private plugin: EfrosinePlugin;
 	private setting: EfrosineSettings;
 	private buttonField: ButtonField;
 	private resolvePromise: (val?: unknown) => void;
 
-	constructor({ plugin, buttonField }: AddButtonSettingsModParams) {
+	constructor({ plugin, buttonField }: ButtonSettingModParams) {
 		super(plugin.app);
 		this.plugin = plugin;
 		this.loadField(buttonField);
@@ -27,11 +27,6 @@ export class AddButtonSettingsMod extends Modal {
 		return new Promise((resolve) => {
 			this.resolvePromise = resolve;
 		});
-	}
-
-	loadField(btField?: ButtonField): void {
-		this.buttonField = btField ?? ButtonField.empty();
-		this.setting = this.plugin.settings;
 	}
 
 	onOpen(): void {
@@ -72,7 +67,12 @@ export class AddButtonSettingsMod extends Modal {
 		this.resolvePromise();
 	}
 
-	onRebuild(contentEl: HTMLElement): void {
+	private loadField(btField?: ButtonField): void {
+		this.buttonField = btField ?? ButtonField.empty();
+		this.setting = this.plugin.settings;
+	}
+
+	private onRebuild(contentEl: HTMLElement): void {
 		const { name, position, type, command } = this.buttonField;
 
 		new Setting(contentEl).setName("Name").addText((text) =>

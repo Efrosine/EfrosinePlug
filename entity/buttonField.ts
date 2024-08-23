@@ -1,7 +1,7 @@
-import { ButtonPosition, ButtonType } from "core/enums";
-import EfrosinePlugin from "main";
-import { CommandManager } from "manager/commandManager";
 import { Command } from "obsidian";
+import EfrosinePlugin from "main";
+import { ButtonPosition, ButtonType } from "core/enums";
+import { CommandManager } from "manager/commandManager";
 
 export class ButtonField {
 	name: string;
@@ -9,6 +9,7 @@ export class ButtonField {
 	position: ButtonPosition;
 	command: Command;
 	filePath?: string;
+
 	constructor(
 		name: string,
 		type: ButtonType,

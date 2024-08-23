@@ -3,10 +3,12 @@ import { ButtonField } from "entity/buttonField";
 
 export class ButtonManager {
 	plugin: EfrosinePlugin;
+
 	constructor(plugin: EfrosinePlugin) {
 		this.plugin = plugin;
 	}
-	public insertButton(button: ButtonField): void {
+
+	insertButton(button: ButtonField): void {
 		const editor = this.plugin.app.workspace.activeEditor?.editor;
 		if (!editor) return;
 

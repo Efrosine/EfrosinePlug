@@ -1,16 +1,17 @@
 import EfrosinePlugin from "main";
-import { CommandManager } from "./commandManager";
 import { ButtonField } from "entity/buttonField";
 import { ButtonPosition, ButtonType } from "core/enums";
-import { NoteManager } from "./noteManager";
+import { NoteManager } from "manager/noteManager";
+import { CommandManager } from "./commandManager";
 
 export class PostProcessorManager {
 	plugin: EfrosinePlugin;
+
 	constructor(plugin: EfrosinePlugin) {
 		this.plugin = plugin;
 	}
 
-	public execute(): void {
+	execute(): void {
 		this.plugin.registerMarkdownCodeBlockProcessor(
 			"efrosine-but",
 			(source, el) => {

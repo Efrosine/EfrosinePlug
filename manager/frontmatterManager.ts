@@ -15,26 +15,12 @@ export class FrontmatterManager {
 	}
 
 	/**
-	 * Replaces the front matter in the given content with the new front matter.
-	 *
-	 * @param content - The original content with front matter.
-	 * @param newFrontmatter - The new front matter to replace the original front matter.
-	 * @returns The content with the replaced front matter.
-	 */
-	swapFrontMatter(content: string, newFrontmatter: string): string {
-		return content.replace(
-			/^---\n([\s\S]*?)\n---\n/,
-			`---\n${newFrontmatter}---\n`
-		);
-	}
-
-	/**
 	 * Inserts the front matter field to the given file.
 	 *
 	 * @param file - The file to insert the front matter field.
 	 * @param field - The front matter field to insert.
 	 */
-	public async insertFrontmatter(file: TFile, field: FrontmatterField) {
+	async insertFrontmatter(file: TFile, field: FrontmatterField) {
 		const { vault } = this.app;
 		if (!file) {
 			new Notice("No file is open");
@@ -82,7 +68,7 @@ export class FrontmatterManager {
 	 * @param file - The file to update the front matter.
 	 * @param newField - The new front matter to update.
 	 */
-	public async updateFrontMatter(file: TFile, newField: Record<string, any>) {
+	async updateFrontMatter(file: TFile, newField: Record<string, any>) {
 		const { vault } = this.app;
 		if (!file) {
 			new Notice("No file is open");
@@ -109,7 +95,7 @@ export class FrontmatterManager {
 	 * @param file - The file to get the front matter.
 	 * @returns The front matter of the given file.
 	 */
-	public getCurrentField(file: TFile) {
+	getCurrentField(file: TFile) {
 		return this.app.metadataCache.getFileCache(file)?.frontmatter;
 	}
 
@@ -119,7 +105,7 @@ export class FrontmatterManager {
 	 * @param file - The file to retrieve the last frontmatter line from.
 	 * @returns The line number of the last line of the frontmatter, or 0 if not found.
 	 */
-	public getFmLastLine(file: TFile): number {
+	getFmLastLine(file: TFile): number {
 		const result =
 			this.app.metadataCache.getFileCache(file)?.frontmatterPosition?.end
 				.line;
@@ -132,7 +118,7 @@ export class FrontmatterManager {
 	 * @param settings - The EfrosineSettings object containing the front matter field settings.
 	 * @returns A Promise that resolves after the mtime field is updated.
 	 */
-	public async updateMtime(settings: EfrosineSettings) {
+	async updateMtime(settings: EfrosineSettings) {
 		const { app } = this;
 
 		await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -167,5 +153,19 @@ export class FrontmatterManager {
 				}
 			});
 		});
+	}
+
+	/**
+	 * Replaces the front matter in the given content with the new front matter.
+	 *
+	 * @param content - The original content with front matter.
+	 * @param newFrontmatter - The new front matter to replace the original front matter.
+	 * @returns The content with the replaced front matter.
+	 */
+	private swapFrontMatter(content: string, newFrontmatter: string): string {
+		return content.replace(
+			/^---\n([\s\S]*?)\n---\n/,
+			`---\n${newFrontmatter}---\n`
+		);
 	}
 }
