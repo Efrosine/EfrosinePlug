@@ -3,6 +3,8 @@ import { CaptureInsertWhere } from "core/enums";
 
 import EfrosinePlugin from "main";
 import { Notice } from "obsidian";
+import { FrontmatterManager } from "./frontmatterManager";
+import { NoteManager } from "./noteManager";
 
 interface CaptureManagerParams {
 	plugin: EfrosinePlugin;
@@ -20,64 +22,55 @@ export class CaptureManager {
 	}
 
 	public async call() {
-		const editor = this.plugin.app.workspace.activeEditor?.editor;
-		const file = this.plugin.app.workspace.getActiveFile();
-
-		if (!editor) {
-			new Notice("Editor not found");
-			return;
-		}
+		const { app } = this.plugin;
+		const file = app.workspace.getActiveFile();
 		if (!file) {
-			new Notice("File not found");
-			return;
+			throw new Error("file not found");
 		}
-		let insertPos = { line: 0, ch: 0 };
-		let newValue = this.func.value;
-		let endInsertPos;
-		let content;
-
+		const noteManager = new NoteManager(app);
+		const content = await app.vault.read(file);
+		let newContent = content;
+		let target = NoteManager.contentToArray(content);
+		const regex = this.func.insertRegEx;
+		let insertPos = 0;
 		switch (this.func.inssertWhere) {
 			case CaptureInsertWhere.Cursor:
-				insertPos = editor.getCursor();
+				const editor = app.workspace.activeEditor?.editor;
+				if (!editor) throw new Error("editor not found");
+				insertPos = editor.getCursor().line;
 				break;
 			case CaptureInsertWhere.Top:
-				const temp =
-					this.plugin.app.metadataCache.getFileCache(file)
-						?.frontmatterPosition?.end.line;
-				insertPos = temp
-					? { line: temp + 1, ch: 0 }
-					: { line: 0, ch: 0 };
-				newValue = `${newValue}\n`;
+				insertPos =
+					new FrontmatterManager({ app: app }).getFmLastLine(file) +
+					1;
 				break;
 			case CaptureInsertWhere.Bottom:
-				insertPos = { line: editor.lastLine() + 1, ch: 0 };
+				insertPos = target.length;
 				break;
 			case CaptureInsertWhere.Replace:
-				content = editor.getValue();
-				newValue = content.replace(
-					this.func.insertRegEx ?? "",
-					this.func.value
-				);
-				endInsertPos = { line: editor.lastLine(), ch: 0 };
-				break;
+				if (!regex) {
+					new Notice("Regex not found");
+					return;
+				}
+				newContent = content.replace(regex, this.func.value);
+				noteManager.modifyContent(file, newContent);
+				return;
 			case CaptureInsertWhere.InsertAfter:
 				new Notice("Not Implemented Yet");
 				return;
 			case CaptureInsertWhere.InsertBefore:
-				content = editor.getValue();
-				const contentLines = content.split("\n");
-				const regex = new RegExp(this.func.insertRegEx ?? "");
-				const targetline = contentLines.findIndex((line) =>
-					regex.test(line)
-				);
-				insertPos = { line: targetline, ch: 0 };
-				newValue = `${newValue}\n`;
+				if (!regex) {
+					new Notice("Regex not found");
+					return;
+				}
+				insertPos = NoteManager.getLinePos(target, regex);
 				break;
 			default:
-				new Notice("Insert Where not found");
+				new Notice("Insert Where not valid");
 				return;
 		}
-
-		editor.replaceRange(newValue, insertPos, endInsertPos);
+		target.splice(insertPos, 0, this.func.value);
+		newContent = NoteManager.arrayToContent(target);
+		noteManager.modifyContent(file, newContent);
 	}
 }

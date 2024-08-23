@@ -114,6 +114,19 @@ export class FrontmatterManager {
 	}
 
 	/**
+	 * Retrieves the last line of the frontmatter in the specified file.
+	 *
+	 * @param file - The file to retrieve the last frontmatter line from.
+	 * @returns The line number of the last line of the frontmatter, or 0 if not found.
+	 */
+	public getFmLastLine(file: TFile): number {
+		const result =
+			this.app.metadataCache.getFileCache(file)?.frontmatterPosition?.end
+				.line;
+		return result ? result : 0;
+	}
+
+	/**
 	 * Updates the modification time (mtime) field in the front matter of the active file.
 	 *
 	 * @param settings - The EfrosineSettings object containing the front matter field settings.

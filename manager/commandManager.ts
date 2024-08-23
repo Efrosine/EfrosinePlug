@@ -35,6 +35,7 @@ export class CommandManager {
 	}
 
 	public removeCommand(id: string) {
+		//todo rename bug
 		if (this.findCommand(this.formatCommandId(id))) {
 			// @ts-ignore
 			delete this.app.commands.commands[this.formatCommandId(id)];
