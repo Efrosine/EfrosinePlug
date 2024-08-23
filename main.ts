@@ -1,4 +1,4 @@
-import { Notice, Plugin } from "obsidian";
+import { getLinkpath, Notice, parseLinktext, Plugin } from "obsidian";
 
 import { SettingsTab } from "./core/configTab";
 import { FmOptionMod } from "./modal/fmOptionsMod";
@@ -21,9 +21,12 @@ export default class EfrosinePlugin extends Plugin {
 
 		new PostProcessorManager(this).execute();
 		this.addRibbonIcon("dice", "test", () => {
-			//@ts-ignore
-			const a = this.app;
-			console.log(a);
+			const temp = this.app.metadataCache.getFileCache(
+				this.app.workspace.getActiveFile()!
+			);
+			console.log(temp);
+			const link = this.app.vault.getFileByPath("123/qwert.md");
+			console.log("file path", link);
 		});
 
 		this.addCommand({

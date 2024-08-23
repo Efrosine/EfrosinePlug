@@ -75,6 +75,9 @@ font-size: small;
     padding: 8px;
 }
 
+.mod-nav:hover{
+    cursor: default;
+}
 .but-right .mod-nav{
     align-items: end;
 }

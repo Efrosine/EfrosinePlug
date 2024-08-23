@@ -8,16 +8,19 @@ export class ButtonField {
 	type: ButtonType;
 	position: ButtonPosition;
 	command: Command;
+	filePath?: string;
 	constructor(
 		name: string,
 		type: ButtonType,
 		position: ButtonPosition,
-		command: Command
+		command: Command,
+		filePath?: string
 	) {
 		this.name = name;
 		this.type = type;
 		this.position = position;
 		this.command = command;
+		this.filePath = filePath;
 	}
 
 	static empty(): ButtonField {
@@ -37,6 +40,7 @@ export class ButtonField {
 		const command = new CommandManager(plugin).findCommand(
 			map["commandId"]
 		)!;
+		const filePath = map["filePath"];
 		if (!name || !type || !position || !command) {
 			return undefined;
 		}
@@ -44,14 +48,17 @@ export class ButtonField {
 			name,
 			type as ButtonType,
 			position as ButtonPosition,
-			command
+			command,
+			filePath
 		);
 	}
 
 	static toString(button: ButtonField): string {
-		const { name, type, position, command } = button;
+		const { name, type, position, command, filePath } = button;
 		const backtic = "```";
-		const displayString = `${backtic}efrosine-but\nname= ${name}\ntype= ${type}\nposition= ${position}\ncommandId= ${command.id}\n${backtic}\n`;
+		const displayString = `${backtic}efrosine-but\nname= ${name}\ntype= ${type}\nposition= ${position}\ncommandId= ${
+			command.id
+		}\nfilePath= ${filePath ?? ""}\n${backtic}\n`;
 
 		return displayString;
 	}

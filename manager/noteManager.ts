@@ -1,4 +1,4 @@
-import { App, TFile } from "obsidian";
+import { App, Notice, TFile } from "obsidian";
 
 export class NoteManager {
 	app: App;
@@ -21,5 +21,14 @@ export class NoteManager {
 
 	public modifyContent(file: TFile, newContent: string): void {
 		this.app.vault.modify(file, newContent);
+	}
+
+	public openFileByPath(filePath: string): void {
+		const file = this.app.vault.getFileByPath(filePath);
+		if (!file) {
+			new Notice("File not found");
+			return;
+		}
+		this.app.workspace.getLeaf().openFile(file);
 	}
 }
