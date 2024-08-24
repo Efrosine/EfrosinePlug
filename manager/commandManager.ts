@@ -22,7 +22,6 @@ export class CommandManager {
 	}
 
 	removeCommand(id: string) {
-		//todo rename bug
 		if (this.findCommand(this.formatCommandId(id))) {
 			// @ts-ignore
 			delete this.app.commands.commands[this.formatCommandId(id)];
@@ -31,11 +30,9 @@ export class CommandManager {
 		}
 	}
 
-	renameCommand(oldId: string, newId: string) {
-		this.removeCommand(oldId);
-		this.addCommand(
-			this.plugin.settings.macroFields.find((f) => f.name === newId)!
-		);
+	renameCommand(oldField: MacroField, newField: MacroField) {
+		this.removeCommand(oldField.name);
+		this.addCommand(newField);
 	}
 
 	listCommand(): Command[] {

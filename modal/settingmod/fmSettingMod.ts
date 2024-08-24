@@ -17,7 +17,10 @@ export class FmSettingMod extends Modal {
 	constructor({ plugin, fmField }: FmSettingModParams) {
 		super(plugin.app);
 		this.plugin = plugin;
-		this.fmField = fmField ?? this.loadField();
+		this.setting = plugin.settings;
+		this.fmField = fmField
+			? JSON.parse(JSON.stringify(fmField))
+			: this.loadField();
 	}
 
 	open(): Promise<void> {
@@ -28,39 +31,35 @@ export class FmSettingMod extends Modal {
 	}
 
 	onOpen(): void {
-		this.loadField();
-		const { titleEl, modalEl } = this;
+		const { fmField, plugin, setting, titleEl, modalEl } = this;
 		titleEl.setText("Add Frontmatter Field");
+		const oldFmField = { ...fmField };
 		this.onRebuild();
 
 		const footerEl = modalEl.createDiv({ cls: "efro-footer-actions" });
 
-		const addButton = modalEl.createEl("button", {
-			text: this.fmField.name === "" ? "Add" : "Update",
+		const addButton = footerEl.createEl("button", {
+			text: fmField.name === "" ? "Add" : "Update",
 			cls: "mod-cta",
 		});
 		addButton.addEventListener("click", () => {
-			if (this.fmField.name.trim() === "") {
+			if (fmField.name.trim() === "") {
 				new Notice("Name cannot be empty");
 				return;
 			}
 
-			if (this.fmField) {
-				let index = this.setting.fmFields.indexOf(this.fmField);
-				if (index !== -1) {
-					this.setting.fmFields[index] = this.fmField;
-				} else {
-					this.setting.fmFields.push(this.fmField);
-				}
+			let index = setting.fmFields.findIndex(
+				(field) => field.name === oldFmField.name
+			);
+			if (index >= 0) {
+				setting.fmFields[index] = fmField;
 			} else {
-				this.setting.fmFields.push(this.fmField);
+				setting.fmFields.push(fmField);
 			}
-			this.plugin.saveSettings(this.setting);
+
+			plugin.saveSettings(setting);
 			this.close();
 		});
-
-		footerEl.appendChild(addButton);
-		modalEl.appendChild(footerEl);
 	}
 
 	onClose(): void {
@@ -70,31 +69,28 @@ export class FmSettingMod extends Modal {
 	}
 
 	private loadField(): FrontmatterField {
-		this.fmField = this.fmField ?? {
+		this.fmField = {
 			name: "",
 			type: FmFieldType.Text,
-			options: null,
-			dateOptions: null,
 		};
-		this.setting = this.plugin.settings;
 		return this.fmField;
 	}
 
 	private onRebuild(): void {
-		const { contentEl } = this;
+		const { fmField, contentEl } = this;
 		contentEl.empty();
 
 		//Name Field
-		if (this.fmField.type === FmFieldType.Tags) {
-			this.fmField.name = "tags";
+		if (fmField.type === FmFieldType.Tags) {
+			fmField.name = "tags";
 		}
 
 		new Setting(contentEl).setName("Name :").addText((text) =>
 			text
 				.setPlaceholder("inupt name")
-				.setValue(this.fmField.name)
-				.onChange((value) => (this.fmField.name = value))
-				.setDisabled(this.fmField.type === FmFieldType.Tags)
+				.setValue(fmField.name)
+				.onChange((value) => (fmField.name = value))
+				.setDisabled(fmField.type === FmFieldType.Tags)
 				.inputEl.classList.add("full-width")
 		);
 
@@ -109,16 +105,16 @@ export class FmSettingMod extends Modal {
 						])
 					)
 				)
-				.setValue(this.fmField.type)
+				.setValue(fmField.type)
 				.onChange((value) => {
-					this.fmField.type = value as FmFieldType;
+					fmField.type = value as FmFieldType;
 					this.onRebuild();
 				})
 		);
 
 		//Select Field
-		if (this.fmField.type === FmFieldType.Select) {
-			this.fmField.options = this.fmField.options ?? [];
+		if (fmField.type === FmFieldType.Select) {
+			fmField.options = fmField.options ?? [];
 			let optionValue = "";
 			new Setting(contentEl)
 				.setName("Options :")
@@ -133,13 +129,13 @@ export class FmSettingMod extends Modal {
 						.setButtonText("Add Option")
 						.setClass("mod-cta")
 						.onClick(() => {
-							this.fmField.options?.push(optionValue);
+							fmField.options?.push(optionValue);
 							this.onRebuild();
 						})
 				);
 
-			for (let idx = 0; idx < this.fmField.options.length; idx++) {
-				let field = this.fmField.options[idx];
+			for (let idx = 0; idx < fmField.options.length; idx++) {
+				let field = fmField.options[idx];
 				new Setting(contentEl)
 					.setClass("no-line")
 					.addText((text) =>
@@ -147,7 +143,7 @@ export class FmSettingMod extends Modal {
 							.setValue(field)
 							.onChange((value) => {
 								field = value;
-								this.fmField.options![idx] = field;
+								fmField.options![idx] = field;
 							})
 							.inputEl.classList.add("full-width")
 					)
@@ -156,7 +152,7 @@ export class FmSettingMod extends Modal {
 							.setIcon("trash")
 							.setClass("mod-warning")
 							.onClick(() => {
-								this.fmField.options?.remove(field);
+								fmField.options?.remove(field);
 								this.onRebuild();
 							})
 					);
@@ -165,8 +161,8 @@ export class FmSettingMod extends Modal {
 
 		//Date and DateTime Field
 		if (
-			this.fmField.type === FmFieldType.Date ||
-			this.fmField.type === FmFieldType.DateTime
+			fmField.type === FmFieldType.Date ||
+			fmField.type === FmFieldType.DateTime
 		) {
 			new Setting(contentEl)
 				.setName("Default Value :")
@@ -180,9 +176,9 @@ export class FmSettingMod extends Modal {
 								)
 							)
 						)
-						.setValue(this.fmField.dateOptions ?? DateOptions.Now)
+						.setValue(fmField.dateOptions ?? DateOptions.Now)
 						.onChange((value) => {
-							this.fmField.dateOptions = value as DateOptions;
+							fmField.dateOptions = value as DateOptions;
 							this.onRebuild();
 						})
 				);

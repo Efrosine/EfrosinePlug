@@ -20,7 +20,7 @@ export class MacroCaptureSettingMod extends Modal {
 		super(plugin.app);
 		this.plugin = plugin;
 		this.setting = this.plugin.settings;
-		this.macroField = macroField;
+		this.macroField = { ...macroField };
 		this.captureFunction = this.loadField();
 	}
 
@@ -32,9 +32,9 @@ export class MacroCaptureSettingMod extends Modal {
 	}
 
 	onOpen(): void {
-		const { titleEl, modalEl } = this;
-		titleEl.setText(`Setup Capture : ${this.macroField.name}`);
-
+		const { macroField, plugin, setting, titleEl, modalEl } = this;
+		titleEl.setText(`Setup Capture : ${macroField.name}`);
+		const oldMarofield = { ...macroField };
 		this.onRebuild();
 
 		const footerEl = modalEl.createDiv({ cls: "efro-footer-actions" });
@@ -44,41 +44,34 @@ export class MacroCaptureSettingMod extends Modal {
 				cls: "mod-cta",
 			})
 			.addEventListener("click", () => {
-				let macroField = this.macroField;
 				macroField.funcions = this.captureFunction;
-				let index = this.setting.macroFields.indexOf(macroField);
-				const oldMarofield = this.setting.macroFields[index];
-				if (
-					oldMarofield.name !== macroField.name &&
-					oldMarofield.addToCommand
-				) {
-					new CommandManager(this.plugin).renameCommand(
-						oldMarofield.name,
-						macroField.name
-					);
-				}
-				this.setting.macroFields[index] = macroField;
-				const commandEngine = new CommandManager(this.plugin);
+				let index = setting.macroFields.findIndex(
+					(field) => field.name === oldMarofield.name
+				);
+				setting.macroFields[index] = macroField;
+				plugin.saveSettings(this.setting);
+				const commandEngine = new CommandManager(plugin);
 				if (macroField.addToCommand) {
-					commandEngine.addCommand(macroField);
-				} else {
-					commandEngine.removeCommand(macroField.name);
+					if (oldMarofield.name !== macroField.name) {
+						commandEngine.renameCommand(oldMarofield, macroField);
+					} else {
+						commandEngine.addCommand(macroField);
+					}
 				}
-				this.plugin.saveSettings(this.setting);
 				this.close();
 			});
 	}
 
 	onClose(): void {
-		super.onClose();
 		const { contentEl } = this;
 		contentEl.empty();
 		this.resolvePromise();
 	}
 
 	private loadField(): CaptureFunction {
+		let funcions = { ...this.macroField.funcions } as CaptureFunction;
 		return (
-			(this.macroField.funcions as CaptureFunction) ??
+			funcions ??
 			({
 				toActiveFile: true,
 				filePath: "",
@@ -90,13 +83,12 @@ export class MacroCaptureSettingMod extends Modal {
 	}
 
 	private onRebuild(): void {
-		const { macroField, contentEl } = this;
-		console.log("macroFieldOnRebuild", macroField);
+		const { macroField, captureFunction, contentEl } = this;
 		contentEl.empty();
 		new Setting(contentEl).setName("Name").addText((text) => {
 			text.setValue(macroField.name);
 			text.onChange((value) => {
-				this.macroField.name = value;
+				macroField.name = value;
 			});
 		});
 
@@ -106,7 +98,7 @@ export class MacroCaptureSettingMod extends Modal {
 			.addToggle((toggle) => {
 				toggle.setValue(macroField.addToCommand);
 				toggle.onChange((value) => {
-					this.macroField.addToCommand = value;
+					macroField.addToCommand = value;
 				});
 			});
 
@@ -115,14 +107,14 @@ export class MacroCaptureSettingMod extends Modal {
 			.setDesc("File to capture to")
 			.setClass("no-line")
 			.addToggle((toggle) => {
-				toggle.setValue(this.captureFunction.toActiveFile);
+				toggle.setValue(captureFunction.toActiveFile);
 				toggle.onChange((value) => {
-					this.captureFunction.toActiveFile = value;
+					captureFunction.toActiveFile = value;
 					this.onRebuild();
 				});
 			});
 
-		if (!this.captureFunction.toActiveFile) {
+		if (!captureFunction.toActiveFile) {
 			new Setting(contentEl).setName("File path").addSearch((search) => {
 				search.setPlaceholder("File path");
 				const filesug = new FileSuggester(
@@ -130,7 +122,7 @@ export class MacroCaptureSettingMod extends Modal {
 					search.inputEl
 				).onSelect((value) => {
 					search.inputEl.value = value.path;
-					this.captureFunction.filePath = value.path;
+					captureFunction.filePath = value.path;
 					filesug.close();
 				});
 			});
@@ -142,17 +134,17 @@ export class MacroCaptureSettingMod extends Modal {
 				dropdown.addOptions(
 					Object.fromEntries(
 						Object.entries(CaptureInsertWhere).map(
-							([key, value]) => {
+							([_key, value]) => {
 								return [value, value as string];
 							}
 						)
 					)
 				);
-				dropdown.setValue(this.captureFunction.inssertWhere);
+				dropdown.setValue(captureFunction.inssertWhere);
 				dropdown.onChange((value) => {
-					this.captureFunction.inssertWhere =
-						value as CaptureInsertWhere;
-					this.onRebuild();
+					captureFunction.inssertWhere = value as CaptureInsertWhere;
+					dropdown.setValue(captureFunction.inssertWhere);
+					// this.onRebuild();
 				});
 			});
 
@@ -161,28 +153,26 @@ export class MacroCaptureSettingMod extends Modal {
 			CaptureInsertWhere.InsertAfter,
 			CaptureInsertWhere.InsertBefore,
 		];
-		if (isNeedRegex.includes(this.captureFunction.inssertWhere)) {
+		if (isNeedRegex.includes(captureFunction.inssertWhere)) {
 			new Setting(contentEl)
 				.setName("Insert Regex")
 				.setClass("no-line")
 				.addText((text) => {
-					text.setValue(this.captureFunction.insertRegEx ?? "");
+					text.setValue(captureFunction.insertRegEx ?? "");
 					text.onChange((value) => {
-						this.captureFunction.insertRegEx = value;
+						captureFunction.insertRegEx = value;
 					});
 				});
 		}
 
-		if (
-			this.captureFunction.inssertWhere === CaptureInsertWhere.InsertAfter
-		) {
+		if (captureFunction.inssertWhere === CaptureInsertWhere.InsertAfter) {
 			new Setting(contentEl)
 				.setName("Insert At End Section")
 				.setClass("no-line")
 				.addToggle((toggle) => {
-					toggle.setValue(this.captureFunction.insertAtEndSection!);
+					toggle.setValue(captureFunction.insertAtEndSection!);
 					toggle.onChange((value) => {
-						this.captureFunction.insertAtEndSection = value;
+						captureFunction.insertAtEndSection = value;
 					});
 				});
 		}
@@ -191,9 +181,9 @@ export class MacroCaptureSettingMod extends Modal {
 			.setName("Value")
 			.setDesc("{{value}} for fect from modal value")
 			.addTextArea((text) => {
-				text.setValue(this.captureFunction.value);
+				text.setValue(captureFunction.value);
 				text.onChange((value) => {
-					this.captureFunction.value = value;
+					captureFunction.value = value;
 				});
 			});
 	}

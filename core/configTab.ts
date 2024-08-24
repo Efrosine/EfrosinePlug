@@ -149,7 +149,9 @@ class MacroSettingRenderrer extends SettingsRenderrer<MacroField> {
 		new MacroCaptureSettingMod({
 			plugin: this.plugin,
 			macroField: item,
-		}).open();
+		})
+			.open()
+			.then(() => this.parent.display());
 	}
 	protected deleteItem(item: MacroField): void {
 		const { settings } = this.plugin;

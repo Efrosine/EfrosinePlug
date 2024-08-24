@@ -19,7 +19,10 @@ export class ButtonSettingMod extends Modal {
 	constructor({ plugin, buttonField }: ButtonSettingModParams) {
 		super(plugin.app);
 		this.plugin = plugin;
-		this.loadField(buttonField);
+		this.setting = plugin.settings;
+		this.buttonField = buttonField
+			? { ...buttonField }
+			: ButtonField.empty();
 	}
 
 	open(): Promise<void> {
@@ -30,33 +33,37 @@ export class ButtonSettingMod extends Modal {
 	}
 
 	onOpen(): void {
-		const { contentEl, titleEl, modalEl } = this;
+		const { buttonField, plugin, setting, contentEl, titleEl, modalEl } =
+			this;
+		const oldButtonField = { ...buttonField };
 		titleEl.setText("Add Button Field");
 		this.onRebuild(contentEl);
 
 		const footerEl = modalEl.createDiv({ cls: "efro-footer-actions" });
 
 		const addButton = footerEl.createEl("button", {
-			text: this.buttonField.name === "" ? "Add" : "Update",
+			text: buttonField.name === "" ? "Add" : "Update",
 			cls: "mod-cta",
 		});
 
 		addButton.addEventListener("click", () => {
-			if (this.buttonField.name.trim() === "") {
+			if (buttonField.name.trim() === "") {
 				new Notice("Name cannot be empty");
 				return;
 			}
 
-			if (this.buttonField) {
-				let index = this.setting.buttonFields.indexOf(this.buttonField);
-				if (index !== -1) {
-					this.setting.buttonFields[index] = this.buttonField;
+			if (buttonField) {
+				let index = setting.buttonFields.findIndex(
+					(field) => field.name === oldButtonField.name
+				);
+				if (index >= 0) {
+					setting.buttonFields[index] = buttonField;
 				} else {
-					this.setting.buttonFields.push(this.buttonField);
+					setting.buttonFields.push(buttonField);
 				}
 			}
 
-			this.plugin.saveData(this.setting);
+			plugin.saveData(setting);
 			this.close();
 		});
 	}
@@ -65,11 +72,6 @@ export class ButtonSettingMod extends Modal {
 		const { contentEl } = this;
 		contentEl.empty();
 		this.resolvePromise();
-	}
-
-	private loadField(btField?: ButtonField): void {
-		this.buttonField = btField ?? ButtonField.empty();
-		this.setting = this.plugin.settings;
 	}
 
 	private onRebuild(contentEl: HTMLElement): void {
