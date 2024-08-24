@@ -44,16 +44,33 @@ export class MacroCaptureSettingMod extends Modal {
 				cls: "mod-cta",
 			})
 			.addEventListener("click", () => {
-				this.macroField.funcions = this.captureFunction;
-				let index = this.setting.macroFields.indexOf(this.macroField);
-				this.setting.macroFields[index] = this.macroField;
-
+				let macroField = this.macroField;
+				macroField.funcions = this.captureFunction;
+				let index = this.setting.macroFields.indexOf(macroField);
+				const oldMarofield = this.setting.macroFields[index];
+				if (
+					oldMarofield.name !== macroField.name &&
+					oldMarofield.addToCommand
+				) {
+					new CommandManager(this.plugin).renameCommand(
+						oldMarofield.name,
+						macroField.name
+					);
+				}
+				this.setting.macroFields[index] = macroField;
+				const commandEngine = new CommandManager(this.plugin);
+				if (macroField.addToCommand) {
+					commandEngine.addCommand(macroField);
+				} else {
+					commandEngine.removeCommand(macroField.name);
+				}
 				this.plugin.saveSettings(this.setting);
 				this.close();
 			});
 	}
 
 	onClose(): void {
+		super.onClose();
 		const { contentEl } = this;
 		contentEl.empty();
 		this.resolvePromise();
@@ -74,6 +91,7 @@ export class MacroCaptureSettingMod extends Modal {
 
 	private onRebuild(): void {
 		const { macroField, contentEl } = this;
+		console.log("macroFieldOnRebuild", macroField);
 		contentEl.empty();
 		new Setting(contentEl).setName("Name").addText((text) => {
 			text.setValue(macroField.name);
@@ -89,12 +107,6 @@ export class MacroCaptureSettingMod extends Modal {
 				toggle.setValue(macroField.addToCommand);
 				toggle.onChange((value) => {
 					this.macroField.addToCommand = value;
-					const commandEngine = new CommandManager(this.plugin);
-					if (value) {
-						commandEngine.addCommand(macroField);
-					} else {
-						commandEngine.removeCommand(macroField.name);
-					}
 				});
 			});
 

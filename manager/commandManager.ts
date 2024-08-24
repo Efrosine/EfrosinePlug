@@ -31,6 +31,13 @@ export class CommandManager {
 		}
 	}
 
+	renameCommand(oldId: string, newId: string) {
+		this.removeCommand(oldId);
+		this.addCommand(
+			this.plugin.settings.macroFields.find((f) => f.name === newId)!
+		);
+	}
+
 	listCommand(): Command[] {
 		//@ts-ignore
 		return this.app.commands.listCommands();
@@ -54,12 +61,12 @@ export class CommandManager {
 		// @ts-ignore
 		await this.app.commands.executeCommand(cmd);
 	}
-	
+
 	async executeCommandById(id: string) {
 		//@ts-ignore
 		await this.app.commands.executeCommandById(id);
 	}
-	
+
 	private formatCommandId(id: string): string {
 		return "efrosine-plug:" + id;
 	}

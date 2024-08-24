@@ -18,12 +18,7 @@ export default class EfrosinePlugin extends Plugin {
 
 		new PostProcessorManager(this).execute();
 		this.addRibbonIcon("dice", "test", () => {
-			const temp = this.app.metadataCache.getFileCache(
-				this.app.workspace.getActiveFile()!
-			);
-			console.log(temp);
-			const link = this.app.vault.getFileByPath("123/qwert.md");
-			console.log("file path", link);
+			console.log(this.app);
 		});
 
 		this.addCommand({
