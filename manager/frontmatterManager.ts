@@ -7,6 +7,9 @@ interface FrontmatterManagerParams {
 	app: App;
 }
 
+/**
+ * Represents a class that manages front matter operations.
+ */
 export class FrontmatterManager {
 	private app: App;
 

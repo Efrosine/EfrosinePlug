@@ -10,6 +10,9 @@ interface ButtonSettingModParams {
 	buttonField?: ButtonField;
 }
 
+/**
+ * This class is responsible for managing the button setting modal.
+ */
 export class ButtonSettingMod extends Modal {
 	private plugin: EfrosinePlugin;
 	private setting: EfrosineSettings;
@@ -74,9 +77,15 @@ export class ButtonSettingMod extends Modal {
 		this.resolvePromise();
 	}
 
+	/**
+	 * This method is responsible for rebuilding the button setting modal.
+	 * @param contentEl The content element of the modal.
+	 * @returns void
+	 */
 	private onRebuild(contentEl: HTMLElement): void {
 		const { name, position, type, command } = this.buttonField;
 
+		// Name
 		new Setting(contentEl).setName("Name").addText((text) =>
 			text
 				.setPlaceholder("Button Name")
@@ -84,6 +93,7 @@ export class ButtonSettingMod extends Modal {
 				.onChange((value) => (this.buttonField.name = value))
 		);
 
+		// Type
 		new Setting(contentEl).setName("Type").addDropdown((dropdown) =>
 			dropdown
 				.addOptions(
@@ -100,6 +110,7 @@ export class ButtonSettingMod extends Modal {
 				)
 		);
 
+		// Position
 		new Setting(contentEl).setName("Position").addDropdown((dropdown) =>
 			dropdown
 				.addOptions(
@@ -117,6 +128,7 @@ export class ButtonSettingMod extends Modal {
 				)
 		);
 
+		// Command
 		new Setting(contentEl).setName("Command").addSearch((search) => {
 			search.setPlaceholder("Command").setValue(command.name);
 			const cmdSug = new CommandSugest(

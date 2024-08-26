@@ -4,6 +4,9 @@ import { ButtonPosition, ButtonType } from "core/enums";
 import { NoteManager } from "manager/noteManager";
 import { CommandManager } from "./commandManager";
 
+/**
+ * This class is responsible for managing the post processor.
+ */
 export class PostProcessorManager {
 	plugin: EfrosinePlugin;
 
@@ -11,6 +14,9 @@ export class PostProcessorManager {
 		this.plugin = plugin;
 	}
 
+	/**
+	 * This method is used to execute the post processor.
+	 */
 	execute(): void {
 		this.plugin.registerMarkdownCodeBlockProcessor(
 			"efrosine-but",
@@ -31,6 +37,13 @@ export class PostProcessorManager {
 		);
 	}
 
+
+	/**
+	 * This method is used to insert a button to the note at
+	 * cursor position.
+	 *
+	 * @param button - The button to insert.
+	 */
 	private normalButton(el: HTMLElement, button: ButtonField): void {
 		const buttonEl = el.createEl("button", {
 			text: button.name,
@@ -41,6 +54,12 @@ export class PostProcessorManager {
 		});
 	}
 
+	/**
+	 * This method is used to insert a navigation button to the note at
+	 * cursor position.
+	 *
+	 * @param button - The button to insert.
+	 */
 	private navButton(el: HTMLElement, button: ButtonField): void {
 		const filePath = button.filePath;
 		if (!filePath) {

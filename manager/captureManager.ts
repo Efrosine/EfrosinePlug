@@ -9,6 +9,10 @@ interface CaptureManagerParams {
 	plugin: EfrosinePlugin;
 	macroField: MacroField;
 }
+
+/**
+ * This class is responsible for managing the capture function.
+ */
 export class CaptureManager {
 	marcroField: MacroField;
 	plugin: EfrosinePlugin;

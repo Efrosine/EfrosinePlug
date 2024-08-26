@@ -16,6 +16,9 @@ interface FmOptionCommandModParams {
 	plugin: EfrosinePlugin;
 }
 
+/**
+ * This class is responsible for managing the frontmatter option command modal.
+ */
 export class FmOptionCommandMod extends SuggestModal<string> {
 	private plugin: EfrosinePlugin;
 
@@ -45,6 +48,9 @@ export class FmOptionCommandMod extends SuggestModal<string> {
 	}
 }
 
+/**
+ * This class is responsible for managing the frontmatter option command modal.
+ */
 class AddFmMod extends BaseFmMod {
 	getSuggestions(
 		query: string
@@ -66,6 +72,9 @@ class AddFmMod extends BaseFmMod {
 	}
 }
 
+/**
+ * This class is responsible for managing the frontmatter option command modal.
+ */
 export class UpdataFmMod extends BaseFmMod {
 	getSuggestions(
 		query: string

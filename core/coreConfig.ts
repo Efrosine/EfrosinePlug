@@ -6,6 +6,7 @@ import {
 	MacroType,
 } from "core/enums";
 import { ButtonField } from "entity/buttonField";
+
 export interface EfrosineSettings {
 	fmFields: FrontmatterField[];
 	macroFields: MacroField[];

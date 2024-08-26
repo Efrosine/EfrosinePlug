@@ -12,6 +12,10 @@ interface SettingsTabParams {
 	plugin: EfrosinePlugin;
 }
 
+/**
+ * This class is responsible for rendering the settings tab for the plugin
+ * @extends PluginSettingTab
+ */
 export class SettingsTab extends PluginSettingTab {
 	private plugin: EfrosinePlugin;
 
@@ -45,6 +49,10 @@ export class SettingsTab extends PluginSettingTab {
 	}
 }
 
+/**
+ * This class is responsible for rendering the frontmatter settings
+ * @extends SettingsRenderrer
+ */
 class FrontmatterSettingRenderrer extends SettingsRenderrer<FrontmatterField> {
 	protected renderMainInput(mainDiv: HTMLElement): void {
 		new Setting(mainDiv)
@@ -98,6 +106,10 @@ class FrontmatterSettingRenderrer extends SettingsRenderrer<FrontmatterField> {
 	}
 }
 
+/**
+ * This class is responsible for rendering the macro settings
+ * @extends SettingsRenderrer
+ */
 class MacroSettingRenderrer extends SettingsRenderrer<MacroField> {
 	protected renderMainInput(mainDiv: HTMLElement): void {
 		let name: string = "";
@@ -163,6 +175,10 @@ class MacroSettingRenderrer extends SettingsRenderrer<MacroField> {
 	}
 }
 
+/**
+ * This class is responsible for rendering the button settings
+ * @extends SettingsRenderrer
+ */
 class ButtonSettingRendererrer extends SettingsRenderrer<ButtonField> {
 	protected renderMainInput(mainDiv: HTMLElement): void {
 		new Setting(mainDiv)

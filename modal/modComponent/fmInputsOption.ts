@@ -3,12 +3,20 @@ import EfrosinePlugin from "main";
 import { FrontmatterManager } from "manager/frontmatterManager";
 import { BaseFmInputMod } from "core/baseMod/baseFmInputMod";
 
+/**
+ * This class is responsible for managing the frontmatter option command modal.
+ * @extends BaseFmInputMod
+ */
 export class FmInputTextMod extends BaseFmInputMod {
 	constructor(plugin: EfrosinePlugin, title: string) {
 		super(plugin, title, "text");
 	}
 }
 
+/**
+ * This class is responsible for managing the frontmatter option command modal.
+ * @extends BaseFmInputMod
+ */
 export class FmInputNumberMod extends BaseFmInputMod {
 	constructor(plugin: EfrosinePlugin, title: string) {
 		super(plugin, title, "number");
@@ -26,18 +34,30 @@ export class FmInputNumberMod extends BaseFmInputMod {
 	}
 }
 
+/**
+ * This class is responsible for managing the frontmatter option command modal.
+ * @extends BaseFmInputMod
+ */
 export class FmInputDateMod extends BaseFmInputMod {
 	constructor(plugin: EfrosinePlugin, title: string) {
 		super(plugin, title, "date");
 	}
 }
 
+/**
+ * This class is responsible for managing the frontmatter option command modal.
+ * @extends BaseFmInputMod
+ */
 export class FmInputDateTimeMod extends BaseFmInputMod {
 	constructor(plugin: EfrosinePlugin, title: string) {
 		super(plugin, title, "datetime-local");
 	}
 }
 
+/**
+ * This class is responsible for managing the frontmatter option command modal.
+ * @extends BaseFmInputMod
+ */
 export class FmInputListMod extends BaseFmInputMod {
 	constructor(plugin: EfrosinePlugin, title: string) {
 		super(plugin, title, "text");
@@ -57,6 +77,10 @@ export class FmInputListMod extends BaseFmInputMod {
 	}
 }
 
+/**
+ * This class is responsible for managing the frontmatter option command modal.
+ * @extends SuggestModal<string>
+ */
 export class FmInputSelectionMod extends SuggestModal<string> {
 	private options: string[];
 	private title: string;

@@ -3,6 +3,9 @@ import EfrosinePlugin from "main";
 import { FrontmatterManager } from "manager/frontmatterManager";
 import { UpdataFmMod } from "modal/commandMod/fmOptionCommandMod";
 
+/**
+ * Represents a base class for a frontmatter input modal.
+ */
 export class BaseFmInputMod extends Modal {
 	protected title: string;
 	private inputType: string;
@@ -20,7 +23,7 @@ export class BaseFmInputMod extends Modal {
 	}
 
 	onOpen(): void {
-		let { contentEl, titleEl } = this;
+		let { file, fmEngine, contentEl, titleEl } = this;
 
 		contentEl.addEventListener("keydown", (evt: KeyboardEvent) => {
 			if (evt.key === "Escape") {
@@ -28,16 +31,16 @@ export class BaseFmInputMod extends Modal {
 			}
 		});
 
-		if (!this.file) {
+		if (!file) {
 			new Notice("No file is open");
 			return;
 		}
-		const curFm = this.fmEngine.getCurrentField(this.file);
+		const curFm = fmEngine.getCurrentField(file);
 		let value: string = curFm?.[this.title] ?? "";
 
 		contentEl.addEventListener("keydown", (evt: KeyboardEvent) => {
 			if (evt.key === "Enter" && evt.altKey) {
-				this.updateFm(this.file!, value);
+				this.updateFm(file!, value);
 				this.close();
 			}
 		});
@@ -67,11 +70,11 @@ export class BaseFmInputMod extends Modal {
 			cls: "mod-cta",
 		});
 		addButton.addEventListener("click", () => {
-			if (!this.file) {
+			if (!file) {
 				new Notice("No file is open");
 				return;
 			}
-			this.updateFm(this.file, value);
+			this.updateFm(file, value);
 			this.close();
 		});
 	}
@@ -81,8 +84,21 @@ export class BaseFmInputMod extends Modal {
 		contentEl.empty();
 	}
 
+	/**
+	 * Renders the footer note element in the specified contentEl.
+	 *
+	 * @param contentEl - The content element to render the footer note in.
+	 * @returns void
+	 */
 	protected footerNote(contentEl: HTMLElement): void {}
 
+	/**
+	 * Updates the frontmatter of the specified file with the given value.
+	 *
+	 * @param file - The file to update the frontmatter of.
+	 * @param value - The value to update the frontmatter with.
+	 * @returns void
+	 */
 	protected updateFm(file: TFile, value: string): void {
 		this.fmEngine.updateFrontMatter(file, { [this.title]: value });
 	}

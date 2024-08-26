@@ -4,6 +4,10 @@ import { FrontmatterField } from "core/coreConfig";
 import { FrontmatterManager } from "manager/frontmatterManager";
 import { FmOptionCommandMod } from "modal/commandMod/fmOptionCommandMod";
 
+/**
+ * Represents a base class for a Frontmatter Modal.
+ * @template FrontmatterField - The type of the frontmatter field.
+ */
 export class BaseFmMod extends SuggestModal<FrontmatterField> {
 	protected plugin: EfrosinePlugin;
 	protected fmFields: FrontmatterField[];

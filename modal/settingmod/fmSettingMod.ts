@@ -68,6 +68,10 @@ export class FmSettingMod extends Modal {
 		this.resolvePromise();
 	}
 
+	/**
+	 * Load the field
+	 * @returns FrontmatterField
+	 */
 	private loadField(): FrontmatterField {
 		this.fmField = {
 			name: "",

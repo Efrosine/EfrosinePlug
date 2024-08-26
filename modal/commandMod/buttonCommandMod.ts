@@ -3,6 +3,9 @@ import EfrosinePlugin from "main";
 import { ButtonManager } from "manager/buttonManager";
 import { ButtonField } from "entity/buttonField";
 
+/**
+ * This class is responsible for managing the button command modal.
+ */
 export class ButtonCommandMod extends SuggestModal<ButtonField> {
 	plugin: EfrosinePlugin;
 

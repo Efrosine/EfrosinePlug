@@ -3,7 +3,9 @@ import EfrosinePlugin from "main";
 import { CaptureManager } from "manager/captureManager";
 import { CommandManager } from "manager/commandManager";
 
-
+/**
+ * This class is used to execute the command.
+ */ 
 export class CommandExecutor {
 	private plugin: EfrosinePlugin;
 
@@ -11,6 +13,11 @@ export class CommandExecutor {
 		this.plugin = plugin;
 	}
 
+	/**
+	 * This method is used to execute the command.
+	 * 
+	 * @param field - The macro field.
+	 */
 	execute(field: MacroField) {
 		if (isCaptureFunction(field.funcions)) {
 			new CaptureManager({
@@ -25,9 +32,21 @@ export class CommandExecutor {
 		}
 	}
 }
+
+/**
+ * This class is used to check if the function is a capture function.
+ * 
+ * @param func - The function to test.
+ */
 function isCaptureFunction(func: any): func is CaptureFunction {
 	return (func as CaptureFunction).toActiveFile !== undefined;
 }
+
+/**
+ * This class is used to check if the function is a sequence function.
+ * 
+ * @param func - The function to test.
+ */
 function isSequenceFunction(func: any): func is SequenceFunction {
 	return (func as SequenceFunction).value !== undefined;
 }
