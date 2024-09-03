@@ -6,6 +6,13 @@
     margin-bottom: 10px;
 }
 
+.efrosine-toc-header{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .no-line{
     border: none;
 }
@@ -13,8 +20,6 @@
     flex: 1;
 
 }
-
-
 
 .efro-label {
     margin-right: 12px;

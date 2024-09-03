@@ -6,6 +6,7 @@ import { FrontmatterManager } from "manager/frontmatterManager";
 import { PostProcessorManager } from "manager/postProcessorManager";
 import { ButtonCommandMod } from "modal/commandMod/buttonCommandMod";
 import { CommandManager } from "manager/commandManager";
+import { NoteManager } from "manager/noteManager";
 
 export default class EfrosinePlugin extends Plugin {
 	settings: EfrosineSettings;
@@ -17,9 +18,7 @@ export default class EfrosinePlugin extends Plugin {
 		this.addSettingTab(new SettingsTab({ plugin: this }));
 
 		new PostProcessorManager(this).execute();
-		this.addRibbonIcon("dice", "test", () => {
-			console.log(this.app);
-		});
+		this.addRibbonIcon("dice", "test", () => {});
 
 		this.addCommand({
 			id: "efrosine-open-fromatter-setting",
@@ -34,6 +33,14 @@ export default class EfrosinePlugin extends Plugin {
 			id: "add-button",
 			editorCallback: (e, m) => {
 				new ButtonCommandMod(this).open();
+			},
+		});
+
+		this.addCommand({
+			name: "Refresh Table of Content",
+			id: "refresh-toc",
+			callback: () => {
+				new NoteManager(this).updateToc();
 			},
 		});
 

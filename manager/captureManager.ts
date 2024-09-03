@@ -29,7 +29,7 @@ export class CaptureManager {
 		const file = app.workspace.getActiveFile();
 		if (!file) throw new Error("file not found");
 
-		const noteManager = new NoteManager(app);
+		const noteManager = new NoteManager(this.plugin);
 		const content = await app.vault.read(file);
 		const regex = this.func.insertRegEx;
 		let insertPos = 0;

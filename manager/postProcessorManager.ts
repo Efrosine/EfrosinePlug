@@ -3,6 +3,7 @@ import { ButtonField } from "entity/buttonField";
 import { ButtonPosition, ButtonType } from "core/enums";
 import { NoteManager } from "manager/noteManager";
 import { CommandManager } from "./commandManager";
+import { FileHeading } from "entity/fileHeading";
 
 /**
  * This class is responsible for managing the post processor.
@@ -18,6 +19,63 @@ export class PostProcessorManager {
 	 * This method is used to execute the post processor.
 	 */
 	execute(): void {
+		this.buttonPostProcessor();
+		this.tableOfContentPostProcessor();
+	}
+
+	/**
+	 * This method is used to register the table of content post processor.
+	 * It will create a table of content in the note.
+	 */
+	private tableOfContentPostProcessor() {
+		this.plugin.registerMarkdownCodeBlockProcessor(
+			"efrosine-toc",
+			async (_source, el) => {
+				const mainDiv = el.createDiv({ cls: "efrosine-toc" });
+
+				const headerDiv = mainDiv.createDiv({
+					cls: "efrosine-toc-header",
+				});
+
+				headerDiv.createEl("h3", { text: "Table of Content" });
+				headerDiv
+					.createEl("button", { text: "Refresh", cls: "mod-cta" })
+					.addEventListener("click", async () => {
+						new NoteManager(this.plugin).updateToc();
+					});
+
+				const noteManager = new NoteManager(this.plugin);
+				const file = noteManager.getCurrentFile();
+				if (!file) return;
+				const headings = noteManager.getHeadings(file);
+				if (!headings) return;
+				const tocData = NoteManager.buildHeadingsHeararchy(headings);
+				this.renderTocList(tocData, mainDiv);
+			}
+		);
+	}
+
+	/**
+	 * This method is used to render the table of content list.
+	 *
+	 * @param items - The items to render.
+	 * @param parentEl - The parent element.
+	 */
+	private renderTocList(items: FileHeading[], parentEl: HTMLElement) {
+		const ul = parentEl.createEl("ul", {});
+		items.forEach((item) => {
+			const li = ul.createEl("li", { text: item.value });
+			if (item.children && item.children.length > 0) {
+				this.renderTocList(item.children, li);
+			}
+		});
+	}
+
+	/**
+	 * This method is used to register the button post processor.
+	 * It will create a button in the note.
+	 */
+	private buttonPostProcessor() {
 		this.plugin.registerMarkdownCodeBlockProcessor(
 			"efrosine-but",
 			(source, el) => {
@@ -36,7 +94,6 @@ export class PostProcessorManager {
 			}
 		);
 	}
-
 
 	/**
 	 * This method is used to insert a button to the note at
@@ -75,7 +132,7 @@ export class PostProcessorManager {
 		subDiv.createEl("p", { text: header });
 		subDiv.createEl("p", { text: displayString });
 		subDiv.addEventListener("click", () =>
-			new NoteManager(this.plugin.app).openFileByPath(filePath)
+			new NoteManager(this.plugin).openFileByPath(filePath)
 		);
 	}
 }
