@@ -30,7 +30,7 @@ export class PostProcessorManager {
 	private tableOfContentPostProcessor() {
 		this.plugin.registerMarkdownCodeBlockProcessor(
 			"efrosine-toc",
-			async (_source, el) => {
+			async (source, el) => {
 				const mainDiv = el.createDiv({ cls: "efrosine-toc" });
 
 				const headerDiv = mainDiv.createDiv({
@@ -44,15 +44,44 @@ export class PostProcessorManager {
 						new NoteManager(this.plugin).updateToc();
 					});
 
-				const noteManager = new NoteManager(this.plugin);
-				const file = noteManager.getCurrentFile();
-				if (!file) return;
-				const headings = noteManager.getHeadings(file);
-				if (!headings) return;
-				const tocData = NoteManager.buildHeadingsHeararchy(headings);
-				this.renderTocList(tocData, mainDiv);
+				const rows = source.split("\n").filter((row) => row !== "");
+				const fileHeading = this.rowsToFildHeading(rows);
+				this.renderTocList(fileHeading, mainDiv);
 			}
 		);
+	}
+
+	/**
+	 * This method is used to convert the rows to file heading.
+	 *
+	 * @param rows - The rows to convert.
+	 * @returns FileHeading[]
+	 */
+	private rowsToFildHeading(rows: string[]): FileHeading[] {
+		let result: FileHeading[] = [];
+		let stack: FileHeading[] = [];
+
+		for (const row of rows) {
+			const temp = new FileHeading({
+				level: row.split("-")[0].match(/\t/g)?.length ?? 0,
+				value: row.split("-")[1].trim(),
+			});
+			while (stack.length > 0 && stack.last()!.level >= temp.level) {
+				stack.pop();
+			}
+
+			if (stack.length > 0) {
+				const parent = stack.last()!;
+				if (!parent.children) {
+					parent.children = [];
+				}
+				parent.children.push(temp);
+			} else {
+				result.push(temp);
+			}
+			stack.push(temp);
+		}
+		return result;
 	}
 
 	/**

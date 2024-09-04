@@ -6,11 +6,20 @@
     margin-bottom: 10px;
 }
 
+.efrosine-toc{
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    border-radius: 8px;
+    background-color:hsla(var(--accent-h),var(--accent-s),var(--accent-l),0.05);
+}
+
 .efrosine-toc-header{
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    border-bottom: 4px solid var(--color-base-50);
 }
 
 .no-line{
