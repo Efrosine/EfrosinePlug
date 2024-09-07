@@ -29,12 +29,12 @@ export class PostProcessorManager {
 	 */
 	private tableOfContentPostProcessor() {
 		this.plugin.registerMarkdownCodeBlockProcessor(
-			"efrosine-toc",
+			"efro-toc-container",
 			async (source, el) => {
-				const mainDiv = el.createDiv({ cls: "efrosine-toc" });
+				const mainDiv = el.createDiv({ cls: "efro-toc-container" });
 
 				const headerDiv = mainDiv.createDiv({
-					cls: "efrosine-toc-header",
+					cls: "efro-toc-header",
 				});
 
 				headerDiv.createEl("h3", { text: "Table of Content" });

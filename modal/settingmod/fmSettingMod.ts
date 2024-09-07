@@ -95,7 +95,7 @@ export class FmSettingMod extends Modal {
 				.setValue(fmField.name)
 				.onChange((value) => (fmField.name = value))
 				.setDisabled(fmField.type === FmFieldType.Tags)
-				.inputEl.classList.add("full-width")
+				.inputEl.classList.add("efro-full-width")
 		);
 
 		//Type Field
@@ -126,7 +126,7 @@ export class FmSettingMod extends Modal {
 					text
 						.setPlaceholder("insert option")
 						.onChange((value) => (optionValue = value))
-						.inputEl.classList.add("full-width")
+						.inputEl.classList.add("efro-full-width")
 				)
 				.addButton((button) =>
 					button
@@ -141,7 +141,7 @@ export class FmSettingMod extends Modal {
 			for (let idx = 0; idx < fmField.options.length; idx++) {
 				let field = fmField.options[idx];
 				new Setting(contentEl)
-					.setClass("no-line")
+					.setClass("efro-no-border")
 					.addText((text) =>
 						text
 							.setValue(field)
@@ -149,7 +149,7 @@ export class FmSettingMod extends Modal {
 								field = value;
 								fmField.options![idx] = field;
 							})
-							.inputEl.classList.add("full-width")
+							.inputEl.classList.add("efro-full-width")
 					)
 					.addButton((button) =>
 						button
@@ -170,7 +170,7 @@ export class FmSettingMod extends Modal {
 		) {
 			new Setting(contentEl)
 				.setName("Default Value :")
-				.setClass("no-line")
+				.setClass("efro-no-border")
 				.addDropdown((dropdown) =>
 					dropdown
 						.addOptions(

@@ -7,6 +7,7 @@ import { PostProcessorManager } from "manager/postProcessorManager";
 import { ButtonCommandMod } from "modal/commandMod/buttonCommandMod";
 import { CommandManager } from "manager/commandManager";
 import { NoteManager } from "manager/noteManager";
+import { CaptureInputMod } from "modal/modComponent/captureInputMod";
 
 export default class EfrosinePlugin extends Plugin {
 	settings: EfrosineSettings;
@@ -18,7 +19,7 @@ export default class EfrosinePlugin extends Plugin {
 		this.addSettingTab(new SettingsTab({ plugin: this }));
 
 		new PostProcessorManager(this).execute();
-		this.addRibbonIcon("dice", "test", () => {});
+		this.addRibbonIcon("dice", "test", async () => {});
 
 		this.addCommand({
 			id: "efrosine-open-fromatter-setting",

@@ -13,14 +13,14 @@ export enum MacroType {
 }
 
 export enum ButtonType {
-	Nav = "mod-nav",
+	Nav = "efro-mod-nav",
 	Warnig = "mod-warning",
 	Cta = "mod-cta",
 }
 
 export enum ButtonPosition {
-	Left = "but-left",
-	Right = "but-right",
+	Left = "efro-but-left",
+	Right = "efro-but-right",
 }
 export enum CaptureInsertWhere {
 	Cursor = "Cursor",

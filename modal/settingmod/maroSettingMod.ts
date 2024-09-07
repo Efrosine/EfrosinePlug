@@ -94,7 +94,7 @@ export class MacroCaptureSettingMod extends Modal {
 
 		new Setting(contentEl)
 			.setName("Add to Command")
-			.setClass("no-line")
+			.setClass("efro-no-border")
 			.addToggle((toggle) => {
 				toggle.setValue(macroField.addToCommand);
 				toggle.onChange((value) => {
@@ -105,7 +105,7 @@ export class MacroCaptureSettingMod extends Modal {
 		new Setting(contentEl)
 			.setName("To Active File")
 			.setDesc("File to capture to")
-			.setClass("no-line")
+			.setClass("efro-no-border")
 			.addToggle((toggle) => {
 				toggle.setValue(captureFunction.toActiveFile);
 				toggle.onChange((value) => {
@@ -156,7 +156,7 @@ export class MacroCaptureSettingMod extends Modal {
 		if (isNeedRegex.includes(captureFunction.inssertWhere)) {
 			new Setting(contentEl)
 				.setName("Insert Regex")
-				.setClass("no-line")
+				.setClass("efro-no-border")
 				.addText((text) => {
 					text.setValue(captureFunction.insertRegEx ?? "");
 					text.onChange((value) => {
@@ -168,7 +168,7 @@ export class MacroCaptureSettingMod extends Modal {
 		if (captureFunction.inssertWhere === CaptureInsertWhere.InsertAfter) {
 			new Setting(contentEl)
 				.setName("Insert At End Section")
-				.setClass("no-line")
+				.setClass("efro-no-border")
 				.addToggle((toggle) => {
 					toggle.setValue(captureFunction.insertAtEndSection!);
 					toggle.onChange((value) => {

@@ -96,7 +96,7 @@ export class NoteManager {
 		const contentArray = NoteManager.contentToArray(content);
 		const { lineStart, lineEnd } = this.findCodeBlockPost(
 			contentArray,
-			"efrosine-toc"
+			"efro-toc-container"
 		);
 		contentArray.splice(
 			lineStart + 1,
