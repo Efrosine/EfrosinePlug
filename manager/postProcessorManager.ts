@@ -109,6 +109,7 @@ export class PostProcessorManager {
 			"efrosine-but",
 			(source, el) => {
 				const buttonEnt = ButtonField.fromString(this.plugin, source);
+				console.log("buttonEnt" + buttonEnt);
 				if (!buttonEnt) {
 					console.error("Button not found");
 					return;
@@ -144,6 +145,7 @@ export class PostProcessorManager {
 	 * This method is used to insert a navigation button to the note at
 	 * cursor position.
 	 *
+	 * @param el - The element to insert the button.
 	 * @param button - The button to insert.
 	 */
 	private navButton(el: HTMLElement, button: ButtonField): void {

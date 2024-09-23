@@ -31,7 +31,7 @@ export class ButtonField {
 
 	/**
 	 * This method is used to create an empty button field.
-	 * 
+	 *
 	 * @returns ButtonField
 	 */
 	static empty(): ButtonField {
@@ -43,7 +43,7 @@ export class ButtonField {
 
 	/**
 	 * This method is used to convert the button field to a map.
-	 * 
+	 *
 	 * @param plugin - The Efrosine plugin.
 	 * @param button - The button field.
 	 * @returns { [key: string]: string }
@@ -59,7 +59,7 @@ export class ButtonField {
 			map["commandId"]
 		)!;
 		const filePath = map["filePath"];
-		if (!name || !type || !position || !command) {
+		if (!name || !type || !position) {
 			return undefined;
 		}
 		return new ButtonField(
@@ -73,7 +73,7 @@ export class ButtonField {
 
 	/**
 	 * This method is used to convert the string to a button field.
-	 * 
+	 *
 	 * @param plugin - The Efrosine plugin.
 	 * @param str - The string.
 	 * @returns ButtonField | undefined
@@ -87,13 +87,14 @@ export class ButtonField {
 		lines.forEach((row) => {
 			const [key, val] = row.split("=").map((part) => part.trim());
 			data[key] = val;
+			console.log("data" + data);
 		});
 		return ButtonField.fromMap(plugin, data);
 	}
 
 	/**
 	 * This method is used to convert the button field to a string.
-	 * 
+	 *
 	 * @param button - The button field.
 	 * @returns string
 	 */

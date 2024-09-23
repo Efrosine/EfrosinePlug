@@ -1,7 +1,10 @@
 import { SuggestModal } from "obsidian";
 import EfrosinePlugin from "main";
-import { ButtonManager } from "manager/buttonManager";
+
 import { ButtonField } from "entity/buttonField";
+import { NavButtonCommadMod } from "./navButtonCommandMod";
+import { ButtonType } from "core/enums";
+import { ButtonManager } from "manager/buttonManager";
 
 /**
  * This class is responsible for managing the button command modal.
@@ -21,7 +24,11 @@ export class ButtonCommandMod extends SuggestModal<ButtonField> {
 		el.setText(value.name);
 	}
 	onChooseSuggestion(item: ButtonField, evt: MouseEvent | KeyboardEvent) {
-		new ButtonManager(this.plugin).insertButton(item);
+		if (item.type === ButtonType.Nav) {
+			new NavButtonCommadMod(this.app, this.plugin, item).open();
+		} else {
+			new ButtonManager(this.plugin).insertButton(item);
+		}
 		this.close();
 	}
 }
